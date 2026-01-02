@@ -1,5 +1,4 @@
-<script setup lang="ts">
-</script>
+<script setup lang="ts"></script>
 
 <template>
   <main>
@@ -12,4 +11,3 @@ h1 {
   color: #42b883;
 }
 </style>
-
