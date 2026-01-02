@@ -21,63 +21,27 @@ const submitForm = () => {
 </script>
 
 <template>
-  <main class="container">
-    <div class="card">
-      <header>
-        <h1>Simulatore Previdenza Complementare</h1>
-        <p class="subtitle">
-          Scopri quanto potresti accumulare per il tuo futuro. Inserisci i tuoi dati per iniziare la
-          simulazione.
-        </p>
-      </header>
+  <v-app>
+    <v-main class="bg-grey-lighten-4">
+      <v-container class="fill-height justify-center">
+        <v-card class="mx-auto pa-6" elevation="3" max-width="800" width="100%">
+          <div class="text-center mb-6">
+            <h1 class="text-h4 font-weight-bold text-primary mb-2">
+              Simulatore Previdenza Complementare
+            </h1>
+            <p class="text-subtitle-1 text-medium-emphasis">
+              Scopri quanto potresti accumulare per il tuo futuro. Inserisci i tuoi dati per
+              iniziare la simulazione.
+            </p>
+          </div>
 
-      <PensionForm v-model="formData" @submit="submitForm" />
-    </div>
-  </main>
+          <PensionForm v-model="formData" @submit="submitForm" />
+        </v-card>
+      </v-container>
+    </v-main>
+  </v-app>
 </template>
 
 <style scoped>
-.container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  padding: 2rem;
-  background-color: #f8fafc;
-  font-family:
-    'Inter',
-    -apple-system,
-    BlinkMacSystemFont,
-    'Segoe UI',
-    Roboto,
-    sans-serif;
-}
-
-.card {
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
-  padding: 2.5rem;
-  width: 100%;
-  max-width: 600px;
-}
-
-header {
-  margin-bottom: 2rem;
-  text-align: center;
-}
-
-h1 {
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: #1e293b;
-  margin-bottom: 0.75rem;
-  letter-spacing: -0.025em;
-}
-
-.subtitle {
-  color: #64748b;
-  line-height: 1.5;
-  font-size: 1rem;
-}
+/* Custom styles removed in favor of Vuetify utility classes */
 </style>

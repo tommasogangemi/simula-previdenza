@@ -16,7 +16,9 @@
     "format": "prettier --write --experimental-cli src/"
   },
   "dependencies": {
-    "vue": "^3.5.26"
+    "@mdi/font": "^7.4.47",
+    "vue": "^3.5.26",
+    "vuetify": "^3.11.6"
   },
   "devDependencies": {
     "@tsconfig/node24": "^24.0.3",

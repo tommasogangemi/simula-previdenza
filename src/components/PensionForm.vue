@@ -9,280 +9,238 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <form @submit.prevent="emit('submit')" class="simulation-form">
-    <div class="form-group">
-      <label for="salary">Retribuzione Annua Lorda (RAL)</label>
-      <div class="input-wrapper">
-        <input
-          id="salary"
+  <v-form @submit.prevent="emit('submit')">
+    <v-row>
+      <v-col cols="12">
+        <v-text-field
+          v-model.number="formData.annualSalary"
+          label="Retribuzione Annua Lorda (RAL)"
           type="number"
-          v-model="formData.annualSalary"
           min="0"
           step="1000"
-          required
-        />
-        <span class="suffix">€</span>
-      </div>
-      <small>Il tuo stipendio lordo annuale.</small>
-    </div>
+          suffix="€"
+          hint="Il tuo stipendio lordo annuale."
+          persistent-hint
+          variant="outlined"
+          color="primary"
+        ></v-text-field>
+      </v-col>
 
-    <div class="form-row">
-      <div class="form-group half">
-        <label for="fundCostPercent">Costo annuo del fondo (%)</label>
-        <div class="input-wrapper">
-          <input
-            id="fundCostPercent"
-            type="number"
-            v-model="formData.fundCostPercent"
-            min="0"
-            max="100"
-            step="0.01"
-          />
-          <span class="suffix">%</span>
+      <v-col cols="12" md="6">
+        <v-text-field
+          v-model.number="formData.fundCostPercent"
+          label="Costo annuo del fondo (%)"
+          type="number"
+          min="0"
+          max="100"
+          step="0.01"
+          suffix="%"
+          hint="Spese di gestione in percentuale."
+          persistent-hint
+          variant="outlined"
+          color="primary"
+        ></v-text-field>
+      </v-col>
+
+      <v-col cols="12" md="6">
+        <v-text-field
+          v-model.number="formData.fundCostFixed"
+          label="Costo annuo fisso (€)"
+          type="number"
+          min="0"
+          step="5"
+          suffix="€"
+          hint="Eventuali spese fisse annuali."
+          persistent-hint
+          variant="outlined"
+          color="primary"
+        ></v-text-field>
+      </v-col>
+
+      <v-col cols="12">
+        <div class="d-flex align-center mb-2">
+          <div class="text-subtitle-1 font-weight-bold">Allocazione Azionaria</div>
+          <v-tooltip location="top">
+            <template v-slot:activator="{ props }">
+              <v-icon
+                v-bind="props"
+                icon="mdi-help-circle-outline"
+                size="small"
+                color="medium-emphasis"
+                class="ml-2"
+              ></v-icon>
+            </template>
+
+            <span>
+              Indica l'allocazione desiderata. Per orizzonti temporali oltre i 10 anni una
+              allocazione più aggressiva (100% azionaria) è quella che potrebbe portare ai
+              rendimenti maggiori.
+            </span>
+          </v-tooltip>
         </div>
-        <small>Spese di gestione in percentuale.</small>
-      </div>
-
-      <div class="form-group half">
-        <label for="fundCostFixed">Costo annuo fisso (€)</label>
-        <div class="input-wrapper">
-          <input
-            id="fundCostFixed"
-            type="number"
-            v-model="formData.fundCostFixed"
-            min="0"
-            step="5"
-          />
-          <span class="suffix">€</span>
-        </div>
-        <small>Eventuali spese fisse annuali.</small>
-      </div>
-    </div>
-
-    <div class="form-group">
-      <label for="stockAllocation">Allocazione Azionaria</label>
-      <div class="range-wrapper">
-        <input
-          id="stockAllocation"
-          type="range"
-          v-model="formData.stockAllocationPercent"
+        <v-slider
+          v-model.number="formData.stockAllocationPercent"
           min="0"
           max="100"
           step="5"
-        />
-        <span class="range-value"
-          >{{ formData.stockAllocationPercent }}% Azioni /
-          {{ 100 - formData.stockAllocationPercent }}% Obbligazioni</span
-        >
-      </div>
-      <small>Percentuale del portafoglio investita in azioni.</small>
-    </div>
+          color="primary"
+          track-color="grey-lighten-2"
+          thumb-label
+          hide-details
+          class="mb-1"
+        ></v-slider>
+        <div class="d-flex justify-center align-center ga-2">
+          <span class="text-body-2 font-weight-medium text-medium-emphasis">
+            {{ 100 - formData.stockAllocationPercent }}% Obbligazioni
+          </span>
+          <span class="text-body-2 font-weight-medium text-medium-emphasis"> - </span>
+          <span class="text-body-2 font-weight-bold text-primary">
+            {{ formData.stockAllocationPercent }}% Azioni
+          </span>
+        </div>
+      </v-col>
 
-    <div class="form-group">
-      <label for="expectedReturn">Rendimento annuo atteso (%)</label>
-      <div class="input-wrapper">
-        <input
-          id="expectedReturn"
+      <v-col cols="12">
+        <v-text-field
+          v-model.number="formData.expectedReturnPercent"
+          label="Rendimento annuo atteso (%)"
           type="number"
-          v-model="formData.expectedReturnPercent"
           min="-100"
           max="100"
           step="0.1"
-        />
-        <span class="suffix">%</span>
-      </div>
-      <small>Stima prudenziale del rendimento lordo.</small>
-    </div>
+          suffix="%"
+          hint="Stima prudenziale del rendimento lordo."
+          persistent-hint
+          variant="outlined"
+          color="primary"
+        >
+          <template v-slot:append-inner>
+            <v-tooltip location="top" interactive>
+              <template v-slot:activator="{ props }">
+                <v-icon
+                  v-bind="props"
+                  icon="mdi-help-circle-outline"
+                  size="small"
+                  color="medium-emphasis"
+                ></v-icon>
+              </template>
 
-    <div class="form-group">
-      <label for="yearsToRetirement">Anni al pensionamento</label>
-      <div class="input-wrapper">
-        <input
-          id="yearsToRetirement"
+              <span>
+                Stima del rendimento annuo lordo atteso in base all'allocazione. Per una allocazione
+                100% azionaria un rendimento realistico potrebbe essere tra il 7 e l'8%. Per una
+                allocazione 100% obbligazioni potrebbe essere invece tra il 2 e il 3%. I rendimenti
+                storici dei principali fondi pensione sono reperibili tramite il sito
+                <a
+                  href="https://www.covip.it/per-gli-operatori/fondi-pensione/costi-e-rendimenti-dei-fondi-pensione/elenco-dei-rendimenti"
+                  target="_blank"
+                  >covip.it</a
+                >.
+              </span>
+            </v-tooltip>
+          </template>
+        </v-text-field>
+      </v-col>
+
+      <v-col cols="12">
+        <v-text-field
+          v-model.number="formData.yearsToRetirement"
+          label="Anni al pensionamento"
           type="number"
-          v-model="formData.yearsToRetirement"
           min="1"
           max="70"
           step="1"
-        />
-        <span class="suffix">anni</span>
-      </div>
-      <small>Numero di anni mancanti alla pensione.</small>
-    </div>
+          suffix="anni"
+          hint="Numero di anni mancanti alla pensione."
+          persistent-hint
+          variant="outlined"
+          color="primary"
+        ></v-text-field>
+      </v-col>
 
-    <div class="form-row">
-      <div class="form-group half">
-        <label for="voluntaryContrib">Contributo Volontario (%)</label>
-        <div class="input-wrapper">
-          <input
-            id="voluntaryContrib"
-            type="number"
-            v-model="formData.voluntaryContributionPercent"
-            min="0"
-            max="100"
-            step="0.1"
-          />
-          <span class="suffix">%</span>
-        </div>
-        <small>Extra versato dal tuo stipendio.</small>
-      </div>
+      <v-col cols="12" md="6">
+        <v-text-field
+          v-model.number="formData.voluntaryContributionPercent"
+          label="Contributo Volontario (%)"
+          type="number"
+          min="0"
+          max="100"
+          step="0.1"
+          suffix="%"
+          hint="Extra versato (in percentuale dal tuo stipendio)."
+          persistent-hint
+          variant="outlined"
+          color="primary"
+        >
+          <template v-slot:append-inner>
+            <v-tooltip location="top">
+              <template v-slot:activator="{ props }">
+                <v-icon
+                  v-bind="props"
+                  icon="mdi-help-circle-outline"
+                  size="small"
+                  color="medium-emphasis"
+                ></v-icon>
+              </template>
 
-      <div class="form-group half">
-        <label for="employerContrib">Contributo Datore (%)</label>
-        <div class="input-wrapper">
-          <input
-            id="employerContrib"
-            type="number"
-            v-model="formData.employerContributionPercent"
-            min="0"
-            max="100"
-            step="0.1"
-          />
-          <span class="suffix">%</span>
-        </div>
-        <small>Versato dall'azienda (se previsto).</small>
-      </div>
-    </div>
+              <span>
+                Percentuale dello stipendio lordo che si sceglie di versare volontariamente nel
+                fondo pensione. Nei fondi pensione negoziali, ovvero quelli legati alle categorie
+                dei vari CCNL versare una data percentuale volontaria permette di avvalersi del
+                contributo datoriale concordato dal contratto nazionale.
+              </span>
+            </v-tooltip>
+          </template>
+        </v-text-field>
+      </v-col>
 
-    <button type="submit" class="submit-btn">Simula</button>
-  </form>
+      <v-col cols="12" md="6">
+        <v-text-field
+          v-model.number="formData.employerContributionPercent"
+          label="Contributo Datore (%)"
+          type="number"
+          min="0"
+          max="100"
+          step="0.1"
+          suffix="%"
+          hint="Versato dall'azienda (se previsto)."
+          persistent-hint
+          variant="outlined"
+          color="primary"
+        >
+          <template v-slot:append-inner>
+            <v-tooltip location="top">
+              <template v-slot:activator="{ props }">
+                <v-icon
+                  v-bind="props"
+                  icon="mdi-help-circle-outline"
+                  size="small"
+                  color="medium-emphasis"
+                ></v-icon>
+              </template>
+
+              <span>
+                Contributo datoriale. Una percentuale dello stipendio che viene corrisposta da parte
+                dell'azienda, qualora il lavoratore effettui un contributo volontario. Le
+                percentuali sono previste dal contratto nazionale e variano in base alla categoria
+                del CCNL, e sono reperibili sui siti dei rispettivi fondi di categoria.
+              </span>
+            </v-tooltip>
+          </template>
+        </v-text-field>
+      </v-col>
+
+      <v-col cols="12" class="mt-4">
+        <v-btn
+          type="submit"
+          block
+          color="primary"
+          size="x-large"
+          elevation="4"
+          class="text-none font-weight-bold"
+        >
+          Calcola Previsione
+        </v-btn>
+      </v-col>
+    </v-row>
+  </v-form>
 </template>
-
-<style scoped>
-.simulation-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.form-row {
-  display: flex;
-  gap: 1.5rem;
-}
-
-.half {
-  flex: 1;
-}
-
-label {
-  font-size: 0.925rem;
-  font-weight: 600;
-  color: #334155;
-}
-
-.input-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-input[type='number'],
-input[type='text'] {
-  width: 100%;
-  padding: 0.75rem 1rem;
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
-  font-size: 1rem;
-  color: #1e293b;
-  transition:
-    border-color 0.2s,
-    box-shadow 0.2s;
-  background: #f8fafc;
-}
-
-input[type='number']:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-  background: white;
-}
-
-.suffix {
-  position: absolute;
-  right: 1rem;
-  color: #64748b;
-  font-weight: 500;
-  pointer-events: none;
-}
-
-small {
-  font-size: 0.8rem;
-  color: #94a3b8;
-  margin-top: 0.1rem;
-}
-
-/* Range slider styling */
-.range-wrapper {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-input[type='range'] {
-  width: 100%;
-  height: 6px;
-  background: #e2e8f0;
-  border-radius: 3px;
-  outline: none;
-  -webkit-appearance: none;
-}
-
-input[type='range']::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 18px;
-  height: 18px;
-  background: #3b82f6;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-input[type='range']::-webkit-slider-thumb:hover {
-  background: #2563eb;
-}
-
-.range-value {
-  font-size: 0.9rem;
-  color: #3b82f6;
-  font-weight: 600;
-  text-align: right;
-}
-
-.submit-btn {
-  margin-top: 1rem;
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-  color: white;
-  border: none;
-  padding: 1rem;
-  font-size: 1.05rem;
-  font-weight: 600;
-  border-radius: 8px;
-  cursor: pointer;
-  transition:
-    transform 0.1s,
-    box-shadow 0.2s;
-  box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3);
-}
-
-.submit-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 8px -1px rgba(59, 130, 246, 0.4);
-}
-
-.submit-btn:active {
-  transform: translateY(0);
-}
-
-@media (max-width: 600px) {
-  .form-row {
-    flex-direction: column;
-    gap: 1.5rem;
-  }
-}
-</style>
