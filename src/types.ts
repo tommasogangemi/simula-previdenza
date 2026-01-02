@@ -7,4 +7,5 @@ export interface PensionFundData {
   yearsToRetirement: number
   voluntaryContributionPercent: number
   employerContributionPercent: number
+  additionalDeductibleContributionPercent: number
 }

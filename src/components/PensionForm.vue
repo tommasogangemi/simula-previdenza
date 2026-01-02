@@ -1,11 +1,30 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import type { PensionFundData } from '../types'
+import { DEDUCTIBLE_LIMIT } from '../constants'
+import { formatCurrency } from '../utils'
 
 const formData = defineModel<PensionFundData>({ required: true })
 
 const emit = defineEmits<{
   (e: 'submit'): void
 }>()
+
+const voluntaryAmount = computed(() => {
+  return (formData.value.annualSalary * formData.value.voluntaryContributionPercent) / 100
+})
+
+const employerAmount = computed(() => {
+  return (formData.value.annualSalary * formData.value.employerContributionPercent) / 100
+})
+
+const remainingDeductible = computed(() => {
+  return Math.max(0, DEDUCTIBLE_LIMIT - voluntaryAmount.value - employerAmount.value)
+})
+
+const additionalContributionAmount = computed(() => {
+  return (remainingDeductible.value * formData.value.additionalDeductibleContributionPercent) / 100
+})
 </script>
 
 <template>
@@ -196,7 +215,7 @@ const emit = defineEmits<{
       <v-col cols="12" md="6">
         <v-text-field
           v-model.number="formData.employerContributionPercent"
-          label="Contributo Datore (%)"
+          label="Contributo Datoriale (%)"
           type="number"
           min="0"
           max="100"
@@ -227,6 +246,49 @@ const emit = defineEmits<{
             </v-tooltip>
           </template>
         </v-text-field>
+      </v-col>
+
+      <v-col cols="12">
+        <div class="d-flex gap-4">
+          <v-text-field
+            v-model.number="formData.additionalDeductibleContributionPercent"
+            label="Versamento deducibile aggiuntivo (%)"
+            type="number"
+            min="0"
+            max="100"
+            step="0.1"
+            suffix="%"
+            :hint="`Percentuale del plafond di deducibilità residuo (${DEDUCTIBLE_LIMIT}€).`"
+            persistent-hint
+            variant="outlined"
+            color="primary"
+          >
+            <template v-slot:append-inner>
+              <v-tooltip location="top">
+                <template v-slot:activator="{ props }">
+                  <v-icon
+                    v-bind="props"
+                    icon="mdi-help-circle-outline"
+                    size="small"
+                    color="medium-emphasis"
+                  ></v-icon>
+                </template>
+
+                <span>
+                  Ogni anno versamenti al fondo pensione fino ad un ammontare di
+                  {{ DEDUCTIBLE_LIMIT }}€ sono deducibili ed abbassano il montante IRPEF. A questo
+                  ammontare concorrono versamenti volontari in percentuale, versamenti datoriali e
+                  versamenti aggiuntivi. Più alto è il proprio scaglione IRPEF più efficiente è
+                  versare fino a saturare il plafond di deducibilità residuo.
+                </span>
+              </v-tooltip>
+            </template>
+          </v-text-field>
+
+          <div class="text-h6 font-weight-bold ml-4 mt-1 text-primary">
+            = {{ formatCurrency(additionalContributionAmount) }}
+          </div>
+        </div>
       </v-col>
 
       <v-col cols="12" class="mt-4">

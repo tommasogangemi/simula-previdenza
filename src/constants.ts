@@ -1,0 +1,1 @@
+export const DEDUCTIBLE_LIMIT = 5300

@@ -12,6 +12,7 @@ const formData = ref<PensionFundData>({
   yearsToRetirement: 30,
   voluntaryContributionPercent: 0,
   employerContributionPercent: 0,
+  additionalDeductibleContributionPercent: 0,
 })
 
 const submitForm = () => {
