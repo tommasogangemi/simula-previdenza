@@ -107,6 +107,50 @@ defineProps<{
       </div>
     </v-card>
 
+    <v-card
+      v-if="result.contributionSummary.annualCashFlow !== 0"
+      :color="result.contributionSummary.annualCashFlow >= 0 ? 'success' : 'warning'"
+      variant="tonal"
+      class="pa-4 mb-4 border"
+    >
+      <div class="d-flex align-center justify-space-between">
+        <div class="text-subtitle-2 font-weight-bold d-flex align-center">
+          <v-icon
+            :icon="
+              result.contributionSummary.annualCashFlow >= 0 ? 'mdi-cash-plus' : 'mdi-cash-minus'
+            "
+            size="20"
+            class="mr-2"
+          ></v-icon>
+          Flusso di Cassa Annuo Reale
+
+          <v-tooltip
+            location="top"
+            text="Flusso di cassa effettivo per il mantenimento del piano simulato. Considera i versamenti volontari percentuali e non come flussi negativi ed il risparmio fiscale dovuto a deduzioni come flusso positivo."
+          >
+            <template v-slot:activator="{ props }">
+              <v-icon
+                v-bind="props"
+                icon="mdi-information-outline"
+                size="16"
+                class="ml-2 cursor-help"
+              ></v-icon>
+            </template>
+          </v-tooltip>
+        </div>
+        <div
+          class="text-h6 font-weight-bold"
+          :class="
+            result.contributionSummary.annualCashFlow >= 0
+              ? 'text-success'
+              : 'text-warning-darken-3'
+          "
+        >
+          {{ formatCurrency(result.contributionSummary.annualCashFlow) }}
+        </div>
+      </div>
+    </v-card>
+
     <v-expansion-panels class="mt-4">
       <v-expansion-panel elevation="0" class="border" title="Informazioni aggiuntive">
         <v-expansion-panel-text>
