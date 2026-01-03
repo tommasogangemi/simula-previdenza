@@ -12,6 +12,7 @@ const formData = ref<PensionFundData>({
   stockAllocationPercent: 50,
   expectedReturnPercent: 4.0,
   yearsToRetirement: 30,
+  yearOfFirstContribution: 2026,
   voluntaryContributionPercent: 0,
   employerContributionPercent: 0,
   additionalDeductibleContributionPercent: 0,
@@ -57,6 +58,17 @@ const submitForm = () => {
                 <div class="text-caption">
                   Media ponderata tra titoli di stato (12.5%) e azioni/altri (20%) basata sulla tua
                   allocazione.
+                </div>
+              </v-alert>
+
+              <v-alert color="primary" variant="tonal" icon="mdi-percent" class="mb-4">
+                <div class="text-h6">
+                  Aliquota tassazione capitale:
+                  <strong>{{ simulationResult.capitalTaxationRate.toFixed(2) }}%</strong>
+                </div>
+                <div class="text-caption">
+                  Tassazione sul capitale accumulato al momento del pensionamento. Parte dal 15% e
+                  diminuisce dello 0,3% all'anno dopo 5 anni di adesione, fino a un minimo del 9%.
                 </div>
               </v-alert>
 

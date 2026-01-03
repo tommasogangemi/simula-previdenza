@@ -1,7 +1,13 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { PensionFundData } from '../types'
-import { DEDUCTIBLE_LIMIT } from '../constants'
+import {
+  DEDUCTIBLE_LIMIT,
+  MAX_TAX_RATE,
+  MIN_TAX_RATE,
+  TAX_RATE_DECREASE,
+  YEARS_BEFORE_TAX_RATE_DECREASE,
+} from '../constants'
 import { formatCurrency } from '../utils'
 
 const formData = defineModel<PensionFundData>({ required: true })
@@ -30,6 +36,19 @@ const additionalContributionAmount = computed(() => {
 <template>
   <v-form @submit.prevent="emit('submit')">
     <v-row>
+      <v-col cols="12">
+        <v-text-field
+          v-model="formData.fundName"
+          label="Nome del Fondo"
+          type="text"
+          hint="Il nome del fondo pensione che stai considerando."
+          persistent-hint
+          variant="outlined"
+          color="primary"
+          clearable
+        ></v-text-field>
+      </v-col>
+
       <v-col cols="12">
         <v-text-field
           v-model.number="formData.annualSalary"
@@ -160,7 +179,7 @@ const additionalContributionAmount = computed(() => {
         </v-text-field>
       </v-col>
 
-      <v-col cols="12">
+      <v-col cols="12" md="6">
         <v-text-field
           v-model.number="formData.yearsToRetirement"
           label="Anni al pensionamento"
@@ -174,6 +193,41 @@ const additionalContributionAmount = computed(() => {
           variant="outlined"
           color="primary"
         ></v-text-field>
+      </v-col>
+
+      <v-col cols="12" md="6">
+        <v-text-field
+          v-model.number="formData.yearOfFirstContribution"
+          label="Inizio previdenza complementare"
+          type="number"
+          min="2026"
+          max="2100"
+          step="1"
+          hint="L'anno in cui hai aperto il tuo primo fondo pensione."
+          persistent-hint
+          variant="outlined"
+          color="primary"
+        >
+          <template v-slot:append-inner>
+            <v-tooltip location="top">
+              <template v-slot:activator="{ props }">
+                <v-icon
+                  v-bind="props"
+                  icon="mdi-help-circle-outline"
+                  size="small"
+                  color="medium-emphasis"
+                ></v-icon>
+              </template>
+
+              <span>
+                Indica l'anno di apertura del primo fondo pensione, indipendentemente da quale. Dopo
+                {{ YEARS_BEFORE_TAX_RATE_DECREASE }} anni dalla prima adesione, la tassazione sul
+                capitale versato diminuisce dello {{ TAX_RATE_DECREASE }}% all'anno, partendo dal
+                {{ MAX_TAX_RATE }}% fino a raggiungere un minimo del {{ MIN_TAX_RATE }}%.
+              </span>
+            </v-tooltip>
+          </template>
+        </v-text-field>
       </v-col>
 
       <v-col cols="12" md="6">
