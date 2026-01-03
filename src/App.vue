@@ -64,7 +64,7 @@ const submitForm = () => {
               <v-alert color="primary" variant="tonal" icon="mdi-percent" class="mb-4">
                 <div class="text-h6">
                   Aliquota tassazione capitale:
-                  <strong>{{ simulationResult.capitalTaxationRate.toFixed(2) }}%</strong>
+                  <strong>{{ simulationResult.contributionSummary.taxRate.toFixed(2) }}%</strong>
                 </div>
                 <div class="text-caption">
                   Tassazione sul capitale accumulato al momento del pensionamento. Parte dal 15% e
@@ -72,15 +72,43 @@ const submitForm = () => {
                 </div>
               </v-alert>
 
-              <v-alert color="success" variant="tonal" icon="mdi-cash-multiple" class="mb-4">
-                <div class="text-h6">
-                  TFR Annuo:
-                  <strong>{{ formatCurrency(simulationResult.annualTFR) }}</strong>
-                </div>
-                <div class="text-caption">
-                  Quota annuale del Trattamento Fine Rapporto (RAL / 13.5).
-                </div>
-              </v-alert>
+              <v-divider class="my-6"></v-divider>
+              <h3 class="text-h6 font-weight-bold mb-4">Proiezione Contributi Totali</h3>
+
+              <v-row>
+                <v-col cols="12" md="4">
+                  <v-card variant="outlined" class="pa-4 text-center">
+                    <div class="text-overline mb-1">Totale Versato (Lordo)</div>
+                    <div class="text-h6 font-weight-bold text-primary">
+                      {{
+                        formatCurrency(simulationResult.contributionSummary.grossTotalContribution)
+                      }}
+                    </div>
+                  </v-card>
+                </v-col>
+                <v-col cols="12" md="4">
+                  <v-card variant="outlined" class="pa-4 text-center">
+                    <div class="text-overline mb-1">Tassazione Totale</div>
+                    <div class="text-h6 font-weight-bold text-error">
+                      - {{ formatCurrency(simulationResult.contributionSummary.totalTaxAmount) }}
+                    </div>
+                  </v-card>
+                </v-col>
+                <v-col cols="12" md="4">
+                  <v-card variant="outlined" class="pa-4 text-center bg-primary-lighten-5">
+                    <div class="text-overline mb-1">Contributi Netti</div>
+                    <div class="text-h6 font-weight-bold text-success">
+                      {{
+                        formatCurrency(simulationResult.contributionSummary.netTotalContribution)
+                      }}
+                    </div>
+                  </v-card>
+                </v-col>
+              </v-row>
+              <div class="text-caption mt-2 text-medium-emphasis">
+                Questa proiezione considera la somma di TFR, contributi volontari, datoriali e
+                aggiuntivi per tutto l'orizzonte temporale scelto, al netto della tassazione finale.
+              </div>
             </div>
           </v-slide-y-transition>
         </v-card>

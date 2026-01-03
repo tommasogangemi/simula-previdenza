@@ -1,5 +1,9 @@
 import { describe, it, expect } from 'vitest'
-import { calculateWeightedTaxRate, calculateCapitalTaxRate } from './simulation'
+import {
+  calculateWeightedTaxRate,
+  calculateCapitalTaxRate,
+  calculateContributionSummary,
+} from './simulation'
 import { STOCK_GAINS_TAX_RATE, BOND_GAINS_TAX_RATE, MIN_TAX_RATE, MAX_TAX_RATE } from './constants'
 
 describe('calculateWeightedTaxRate', () => {
@@ -46,8 +50,6 @@ describe('calculateCapitalTaxRate', () => {
   })
 
   it('should calculate correct tax rate for mid-range membership', () => {
-    // Current year + 20 years to retirement = 20 years membership
-    // 15 - (20 - 15) * 0.3 = 15 - 1.5 = 13.5%
     const result = calculateCapitalTaxRate(new Date().getFullYear(), 20)
     expect(result).toBe(13.5)
   })
@@ -84,5 +86,70 @@ describe('calculateCapitalTaxRate', () => {
     const currentYear = new Date().getFullYear()
     const result = calculateCapitalTaxRate(currentYear - 30, 10)
     expect(result).toBe(MIN_TAX_RATE)
+  })
+})
+
+describe('calculateContributionSummary', () => {
+  it('should calculate correctly with only TFR', () => {
+    const annualSalary = 27000
+    const yearsToRetirement = 10
+    const yearOfFirstContribution = new Date().getFullYear()
+
+    const result = calculateContributionSummary(
+      annualSalary,
+      0, // voluntary
+      0, // employer
+      0, // additional
+      yearsToRetirement,
+      yearOfFirstContribution,
+    )
+
+    // TFR: 27000 / 13.5 = 2000
+    expect(result.totalAnnualContribution).toBe(2000)
+    // Gross: 2000 * 10 = 20000
+    expect(result.grossTotalContribution).toBe(20000)
+    expect(result.taxRate).toBe(15)
+    // Tax: 20000 * 0.15 = 3000
+    expect(result.totalTaxAmount).toBe(3000)
+    // Net: 20000 - 3000 = 17000
+    expect(result.netTotalContribution).toBe(17000)
+  })
+
+  it('should respect deductible limit and handle past membership', () => {
+    const annualSalary = 50000
+    const voluntaryPercent = 2 // 1000
+    const employerPercent = 2 // 1000
+    const additionalPercent = 100 // Takes all remaining deductible
+    const yearsToRetirement = 15
+    const currentYear = new Date().getFullYear()
+    const yearOfFirstContribution = currentYear - 15 // 15 years in the past
+
+    const result = calculateContributionSummary(
+      annualSalary,
+      voluntaryPercent,
+      employerPercent,
+      additionalPercent,
+      yearsToRetirement,
+      yearOfFirstContribution,
+    )
+
+    // Annual TFR: 50000 / 13.5 = 3703.70...
+    // Annual Voluntary: 1000
+    // Annual Employer: 1000
+    // Remaining Deductible: 5300 - 1000 - 1000 = 3300
+    // Annual Additional: 3300
+    const expectedAnnual = 3703.7037 + 1000 + 1000 + 3300 // 9003.7037...
+    expect(result.totalAnnualContribution).toBeCloseTo(expectedAnnual, 4)
+
+    // Gross: expectedAnnual * 15 = 135055.55...
+    expect(result.grossTotalContribution).toBeCloseTo(expectedAnnual * 15, 2)
+
+    expect(result.taxRate).toBe(10.5)
+
+    // Tax amount: gross * 10.5%
+    const expectedGross = expectedAnnual * 15
+    const expectedTax = (expectedGross * 10.5) / 100
+    expect(result.totalTaxAmount).toBeCloseTo(expectedTax, 2)
+    expect(result.netTotalContribution).toBeCloseTo(expectedGross - expectedTax, 2)
   })
 })
