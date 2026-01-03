@@ -33,7 +33,7 @@ export interface SimulationResult {
 }
 
 export interface SummaryData {
-  totalAvailableFund: number
+  totalAvailableAmount: number
   totalCapitalGainsTaxPaid: number
   totalCostsPaid: number
 }
@@ -169,7 +169,7 @@ export const calculateFinalSummary = (
 ): SummaryData => {
   if (yearlyData.length === 0) {
     return {
-      totalAvailableFund: 0,
+      totalAvailableAmount: 0,
       totalCapitalGainsTaxPaid: 0,
       totalCostsPaid: 0,
     }
@@ -183,10 +183,10 @@ export const calculateFinalSummary = (
   const totalCostsPaid = yearlyData.reduce((acc, curr) => acc + curr.costs, 0)
 
   // Final available fund = gross accumulated at end - taxes on contributions
-  const totalAvailableFund = Math.max(0, lastSnapshot!.endValue - totalContributionTaxAmount)
+  const totalAvailableAmount = Math.max(0, lastSnapshot!.endValue - totalContributionTaxAmount)
 
   return {
-    totalAvailableFund,
+    totalAvailableAmount,
     totalCapitalGainsTaxPaid,
     totalCostsPaid,
   }

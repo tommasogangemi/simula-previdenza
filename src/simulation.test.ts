@@ -226,12 +226,12 @@ describe('calculateFinalSummary', () => {
     // Total Costs: 10 + 25 = 35
     expect(result.totalCostsPaid).toBe(35)
     // Total Available: 2045 (end value) - 300 (contribution tax) = 1745
-    expect(result.totalAvailableFund).toBe(1745)
+    expect(result.totalAvailableAmount).toBe(1745)
   })
 
   it('should handle empty yearly data', () => {
     const result = calculateFinalSummary([], 0)
-    expect(result.totalAvailableFund).toBe(0)
+    expect(result.totalAvailableAmount).toBe(0)
     expect(result.totalCapitalGainsTaxPaid).toBe(0)
     expect(result.totalCostsPaid).toBe(0)
   })
