@@ -44,8 +44,8 @@ const scrollToTop = () => {
 <template>
   <v-app>
     <v-main class="bg-grey-lighten-4">
-      <v-container class="fill-height justify-center">
-        <v-card class="mx-auto pa-6" elevation="3" max-width="800" width="100%">
+      <v-container class="fill-height justify-center" fluid>
+        <v-card class="mx-auto pa-6" elevation="3" max-width="960" width="100%">
           <div class="text-center mb-6">
             <h1 class="text-h4 font-weight-bold text-primary mb-2">
               Simulatore Previdenza Complementare

@@ -339,7 +339,7 @@ const additionalContributionAmount = computed(() => {
             </template>
           </v-text-field>
 
-          <div class="text-h6 font-weight-bold ml-4 mt-1 text-primary">
+          <div class="text-h6 text-no-wrap font-weight-bold ml-4 mt-1 text-primary">
             = {{ formatCurrency(additionalContributionAmount) }}
           </div>
         </div>
