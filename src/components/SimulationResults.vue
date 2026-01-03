@@ -2,6 +2,7 @@
 import { BOND_GAINS_TAX_RATE, STOCK_GAINS_TAX_RATE } from '@/constants'
 import type { SimulationResult } from '../simulation'
 import { formatCurrency } from '../utils'
+import ResultRow from './ResultRow.vue'
 
 defineProps<{
   result: SimulationResult
@@ -34,51 +35,48 @@ defineProps<{
       </div>
     </v-card>
 
-    <div class="d-flex flex-wrap ga-4 text-caption text-medium-emphasis mb-2">
-      <div class="d-flex align-center">
-        <v-icon icon="mdi-calculator-variant" size="x-small" class="mr-1"></v-icon>
-        Tassazione Rendimenti:
-        <strong class="ml-1">{{ result.capitalGainsTaxRate.toFixed(2) }}%</strong>
-        <v-tooltip location="top">
-          <template v-slot:activator="{ props }">
-            <v-icon
-              v-bind="props"
-              icon="mdi-information-outline"
-              size="14"
-              class="ml-1 cursor-help"
-            ></v-icon>
-          </template>
+    <div class="mt-4 border-t pt-4">
+      <ResultRow
+        label="Totale Contributi Versati"
+        :value="formatCurrency(result.contributionSummary.grossTotalContribution)"
+        icon="mdi-account-cash-outline"
+      />
 
-          <span>
-            Tassazione sui rendimenti dell'investimento, data dalla tua allocazione ed applicata
-            alla fine di ogni anno sui rendimenti del portafoglio. Rappresenta la media ponderata
-            della tassazione del {{ STOCK_GAINS_TAX_RATE }}% sull'azionario e del
-            {{ BOND_GAINS_TAX_RATE }}% sulle obbligazioni.
-          </span>
-        </v-tooltip>
-      </div>
+      <ResultRow
+        label="Totale Rendimenti Netti Ottenuti"
+        :value="formatCurrency(result.summaryData.totalCapitalGains)"
+        icon="mdi-trending-up"
+        icon-color="success"
+      />
 
-      <div class="d-flex align-center">
-        <v-icon icon="mdi-bank-outline" size="x-small" class="mr-1"></v-icon>
-        Tassazione Capitale:
-        <strong class="ml-1">{{ result.contributionSummary.taxRate.toFixed(2) }}%</strong>
-        <v-tooltip location="top">
-          <template v-slot:activator="{ props }">
-            <v-icon
-              v-bind="props"
-              icon="mdi-information-outline"
-              size="14"
-              class="ml-1 cursor-help"
-            ></v-icon>
-          </template>
+      <ResultRow
+        label="Tasse Totali sui Rendimenti"
+        :value="formatCurrency(result.summaryData.totalCapitalGainsTaxPaid)"
+        icon="mdi-chart-line"
+        icon-color="error"
+      />
 
-          <span>
-            Tassazione sui contributi versati nel fondo. Verrà applicata al momento della
-            riscossione, unicamente sull'ammontare versato, ovvero la somma di TFR, contributo
-            datoriale ed i contributi volontari aggiuntivi.
-          </span>
-        </v-tooltip>
-      </div>
+      <ResultRow
+        label="Totale Costi Fondo"
+        :value="formatCurrency(result.summaryData.totalCostsPaid)"
+        icon="mdi-cash-minus"
+        icon-color="error"
+      />
+
+      <ResultRow
+        label="Aliquota Rendimenti"
+        :value="`${result.capitalGainsTaxRate.toFixed(2)}%`"
+        icon="mdi-calculator-variant"
+        :tooltip="`Tassazione media ponderata: ${STOCK_GAINS_TAX_RATE}% azionario, ${BOND_GAINS_TAX_RATE}% obbligazionario.`"
+      />
+
+      <ResultRow
+        label="Aliquota Capitale"
+        :value="`${result.contributionSummary.taxRate.toFixed(2)}%`"
+        icon="mdi-bank-outline"
+        tooltip="Tassazione agevolata sul capitale che scende dal 15% al 9% in base agli anni di adesione."
+        class="mb-0"
+      />
     </div>
   </div>
 </template>

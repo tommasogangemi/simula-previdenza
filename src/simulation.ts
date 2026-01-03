@@ -36,6 +36,7 @@ export interface SummaryData {
   totalAvailableAmount: number
   totalCapitalGainsTaxPaid: number
   totalCostsPaid: number
+  totalCapitalGains: number
 }
 
 /**
@@ -172,6 +173,7 @@ export const calculateFinalSummary = (
       totalAvailableAmount: 0,
       totalCapitalGainsTaxPaid: 0,
       totalCostsPaid: 0,
+      totalCapitalGains: 0,
     }
   }
 
@@ -181,6 +183,7 @@ export const calculateFinalSummary = (
     0,
   )
   const totalCostsPaid = yearlyData.reduce((acc, curr) => acc + curr.costs, 0)
+  const totalCapitalGains = yearlyData.reduce((acc, curr) => acc + curr.netGain, 0)
 
   // Final available fund = gross accumulated at end - taxes on contributions
   const totalAvailableAmount = Math.max(0, lastSnapshot!.endValue - totalContributionTaxAmount)
@@ -189,6 +192,7 @@ export const calculateFinalSummary = (
     totalAvailableAmount,
     totalCapitalGainsTaxPaid,
     totalCostsPaid,
+    totalCapitalGains,
   }
 }
 
