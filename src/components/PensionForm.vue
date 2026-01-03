@@ -354,7 +354,7 @@ const additionalContributionAmount = computed(() => {
           elevation="4"
           class="text-none font-weight-bold"
         >
-          Calcola Previsione
+          Aggiungi simulazione
         </v-btn>
       </v-col>
     </v-row>

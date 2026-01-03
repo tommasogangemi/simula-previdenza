@@ -30,6 +30,7 @@ export interface ContributionSummary {
 }
 
 export interface SimulationResult {
+  fundName?: string
   capitalGainsTaxRate: number
   contributionSummary: ContributionSummary
   yearlyData: YearlySnapshot[]
@@ -270,6 +271,7 @@ export const simulate = (data: PensionFundData): SimulationResult => {
   const summaryData = calculateFinalSummary(yearlyData, contributionSummary.totalTaxAmount)
 
   return {
+    fundName: data.fundName,
     capitalGainsTaxRate,
     contributionSummary,
     yearlyData,

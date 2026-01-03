@@ -45,15 +45,6 @@ defineProps<{
           {{ formatCurrency(result.contributionSummary.annualTaxSavings) }}
         </div>
       </div>
-      <div class="d-flex align-center justify-space-between">
-        <div class="text-subtitle-2 font-weight-medium d-flex align-center">
-          <v-icon icon="mdi-safe-square-outline" size="18" class="mr-2"></v-icon>
-          Risparmio Fiscale Totale
-        </div>
-        <div class="text-h6 font-weight-bold text-success">
-          {{ formatCurrency(result.contributionSummary.totalTaxSavings) }}
-        </div>
-      </div>
     </v-card>
 
     <div class="mt-4 border-t pt-4">

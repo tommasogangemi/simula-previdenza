@@ -12,7 +12,8 @@ import {
   Filler,
 } from 'chart.js'
 import { Line } from 'vue-chartjs'
-import type { YearlySnapshot } from '../simulation'
+import { CHART_COLORS } from '../constants'
+import type { SimulationResult } from '../simulation'
 import { formatCurrency } from '../utils'
 
 ChartJS.register(
@@ -27,31 +28,47 @@ ChartJS.register(
 )
 
 const props = defineProps<{
-  data: YearlySnapshot[]
+  simulations: SimulationResult[]
 }>()
 
-const chartData = computed(() => ({
-  labels: props.data.map((s) => s.year),
-  datasets: [
-    {
-      label: 'Montante Finale (€)',
-      backgroundColor: 'rgba(25, 118, 210, 0.1)',
-      borderColor: '#1976D2',
-      pointBackgroundColor: '#1976D2',
+const chartData = computed(() => {
+  if (props.simulations.length === 0) return { labels: [], datasets: [] }
+
+  // Use the labels from the simulation with most years
+  const maxYearsSimulation = props.simulations.reduce((prev, current) =>
+    prev.yearlyData.length > current.yearlyData.length ? prev : current,
+  )
+  const labels = maxYearsSimulation.yearlyData.map((s) => s.year)
+
+  const datasets = props.simulations.map((sim, index) => {
+    const color = CHART_COLORS[index % CHART_COLORS.length]
+    const label =
+      sim.contributionSummary.totalAnnualContribution > 0
+        ? sim.fundName || `Scenario ${index + 1}`
+        : `Scenario ${index + 1}`
+
+    return {
+      label: `${label} (€)`,
+      backgroundColor: `${color}1A`, // 0.1 opacity
+      borderColor: color,
+      pointBackgroundColor: color,
       pointBorderColor: '#fff',
-      fill: true,
-      data: props.data.map((s) => s.endValue),
+      fill: props.simulations.length === 1, // Only fill if single scenario
+      data: sim.yearlyData.map((s) => s.endValue),
       tension: 0.3,
-    },
-  ],
-}))
+    }
+  })
+
+  return { labels, datasets }
+})
 
 const chartOptions = {
   responsive: true,
   maintainAspectRatio: false,
   plugins: {
     legend: {
-      display: false,
+      display: props.simulations.length > 1,
+      position: 'top' as const,
     },
     tooltip: {
       callbacks: {

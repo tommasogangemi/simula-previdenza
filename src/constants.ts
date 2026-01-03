@@ -37,3 +37,14 @@ export const TAX_BRACKETS = [
   { threshold: 28000, rate: 33 },
   { threshold: 0, rate: 23 },
 ]
+
+/**
+ * Colors for simulation comparison
+ */
+export const CHART_COLORS = [
+  '#9C27B0', // Purple
+  '#FF9800', // Orange
+  '#E91E63', // Pink
+  '#673AB7', // Deep Purple
+  '#FFC107', // Amber
+]
