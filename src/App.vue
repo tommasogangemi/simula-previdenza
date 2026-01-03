@@ -4,6 +4,7 @@ import PensionForm from './components/PensionForm.vue'
 import type { PensionFundData } from './types'
 import { simulate, type SimulationResult } from './simulation'
 import SimulationResults from './components/SimulationResults.vue'
+import SimulationChart from './components/SimulationChart.vue'
 
 const formData = ref<PensionFundData>({
   annualSalary: 30000,
@@ -48,6 +49,7 @@ const submitForm = () => {
           <v-slide-y-transition>
             <div v-if="simulationResult" class="mt-8">
               <SimulationResults :result="simulationResult" />
+              <SimulationChart :data="simulationResult.yearlyData" />
             </div>
           </v-slide-y-transition>
         </v-card>

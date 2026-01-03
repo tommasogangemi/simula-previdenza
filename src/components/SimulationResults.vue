@@ -57,6 +57,13 @@ defineProps<{
       />
 
       <ResultRow
+        label="Tasse Totali sul versato"
+        :value="formatCurrency(result.contributionSummary.totalTaxAmount)"
+        icon="mdi-bank-minus"
+        icon-color="error"
+      />
+
+      <ResultRow
         label="Totale Costi Fondo"
         :value="formatCurrency(result.summaryData.totalCostsPaid)"
         icon="mdi-cash-minus"
@@ -71,7 +78,7 @@ defineProps<{
       />
 
       <ResultRow
-        label="Aliquota Capitale"
+        label="Aliquota Versato"
         :value="`${result.contributionSummary.taxRate.toFixed(2)}%`"
         icon="mdi-bank-outline"
         tooltip="Tassazione agevolata sul capitale che scende dal 15% al 9% in base agli anni di adesione."
