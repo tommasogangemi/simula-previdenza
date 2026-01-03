@@ -22,6 +22,9 @@ export interface SimulationResult {
   contributionSummary: ContributionSummary
 }
 
+/**
+ * Calculates the weighted tax rate based on the given stock allocation percentage.
+ */
 export const calculateWeightedTaxRate = (stockAllocationPercent: number): number => {
   const bondPercent = 100 - stockAllocationPercent
   // Weighted average tax rate: (Stock% * STOCK_GAINS_TAX_RATE%) + (Bond% * BOND_GAINS_TAX_RATE%)
@@ -35,6 +38,9 @@ export const calculateAnnualTFR = (annualSalary: number): number => {
   return annualSalary / 13.5
 }
 
+/**
+ * Calculates the tax rate on contributions added to the pension fund based on the number of years of membership.
+ */
 export const calculateCapitalTaxRate = (
   yearOfFirstContribution: number,
   yearsToRetirement: number,
