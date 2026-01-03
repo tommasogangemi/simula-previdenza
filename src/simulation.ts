@@ -7,6 +7,8 @@ import {
   YEARS_BEFORE_TAX_RATE_DECREASE,
   TAX_RATE_DECREASE,
   DEDUCTIBLE_LIMIT,
+  INPS_CONTRIBUTION_RATE,
+  TAX_BRACKETS,
 } from './constants'
 
 export interface YearlySnapshot {
@@ -23,6 +25,8 @@ export interface ContributionSummary {
   grossTotalContribution: number
   totalTaxAmount: number
   netTotalContribution: number
+  annualTaxSavings: number
+  totalTaxSavings: number
 }
 
 export interface SimulationResult {
@@ -77,6 +81,33 @@ export const calculateCapitalTaxRate = (
 }
 
 /**
+ * Calculates the tax for a given income based on IRPEF brackets.
+ */
+export const calculateTax = (income: number): number => {
+  let tax = 0
+  let remainingIncome = income
+
+  for (const bracket of TAX_BRACKETS) {
+    if (remainingIncome > bracket.threshold) {
+      const taxableInThisBracket = remainingIncome - bracket.threshold
+      tax += (taxableInThisBracket * bracket.rate) / 100
+      remainingIncome = bracket.threshold
+    }
+  }
+
+  return tax
+}
+
+/**
+ * Calculates the tax savings (deduction) based on the income and the deductible amount.
+ */
+export const calculateTaxSavings = (income: number, deduction: number): number => {
+  const taxBeforeDeduction = calculateTax(income)
+  const taxAfterDeduction = calculateTax(Math.max(0, income - deduction))
+  return taxBeforeDeduction - taxAfterDeduction
+}
+
+/**
  * Calculates the contribution summary based on the given parameters.
  * Focuses on the contributions that will be taxed at the end of the simulation with the contribution tax rate.
  */
@@ -96,7 +127,11 @@ export const calculateContributionSummary = (
   const remainingDeductible = Math.max(0, DEDUCTIBLE_LIMIT - annualVoluntary - annualEmployer)
   const annualAdditional = (remainingDeductible * additionalDeductibleContributionPercent) / 100
 
-  const totalAnnualContribution = annualTFR + annualVoluntary + annualEmployer + annualAdditional
+  const taxableIncome = annualSalary * (1 - INPS_CONTRIBUTION_RATE / 100)
+  const totalDeductibleContributions = annualVoluntary + annualEmployer + annualAdditional
+  const annualTaxSavings = calculateTaxSavings(taxableIncome, totalDeductibleContributions)
+
+  const totalAnnualContribution = annualTFR + totalDeductibleContributions
   const grossTotalContribution = totalAnnualContribution * yearsToRetirement
   const totalTaxAmount = (grossTotalContribution * taxRate) / 100
   const netTotalContribution = grossTotalContribution - totalTaxAmount
@@ -107,6 +142,8 @@ export const calculateContributionSummary = (
     grossTotalContribution,
     totalTaxAmount,
     netTotalContribution,
+    annualTaxSavings,
+    totalTaxSavings: annualTaxSavings * yearsToRetirement,
   }
 }
 

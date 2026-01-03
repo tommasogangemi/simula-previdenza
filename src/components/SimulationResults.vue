@@ -13,7 +13,7 @@ defineProps<{
   <div class="simulation-results">
     <h2 class="text-h6 font-weight-bold mb-4">Risultati Simulazione</h2>
 
-    <v-card color="primary" variant="tonal" class="pa-6 mb-6 text-center border">
+    <v-card color="primary" variant="tonal" class="pa-6 mb-4 text-center border">
       <div class="text-subtitle-1 mb-1 d-flex align-center justify-center text-primary">
         Capitale Finale Disponibile
         <v-tooltip location="top">
@@ -32,6 +32,27 @@ defineProps<{
       </div>
       <div class="text-h3 font-weight-bold text-primary">
         {{ formatCurrency(result.summaryData.totalAvailableAmount) }}
+      </div>
+    </v-card>
+
+    <v-card color="success" variant="tonal" class="pa-4 mb-6 border">
+      <div class="d-flex align-center justify-space-between mb-2">
+        <div class="text-subtitle-2 font-weight-medium d-flex align-center">
+          <v-icon icon="mdi-piggy-bank-outline" size="18" class="mr-2"></v-icon>
+          Risparmio Fiscale Annuo
+        </div>
+        <div class="text-h6 font-weight-bold text-success">
+          {{ formatCurrency(result.contributionSummary.annualTaxSavings) }}
+        </div>
+      </div>
+      <div class="d-flex align-center justify-space-between">
+        <div class="text-subtitle-2 font-weight-medium d-flex align-center">
+          <v-icon icon="mdi-safe-square-outline" size="18" class="mr-2"></v-icon>
+          Risparmio Fiscale Totale
+        </div>
+        <div class="text-h6 font-weight-bold text-success">
+          {{ formatCurrency(result.contributionSummary.totalTaxSavings) }}
+        </div>
       </div>
     </v-card>
 

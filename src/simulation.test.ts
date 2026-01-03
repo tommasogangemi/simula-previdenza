@@ -5,6 +5,8 @@ import {
   calculateContributionSummary,
   calculateYearlyProjections,
   calculateFinalSummary,
+  calculateTax,
+  calculateTaxSavings,
 } from './simulation'
 import type { YearlySnapshot } from './simulation'
 import { STOCK_GAINS_TAX_RATE, BOND_GAINS_TAX_RATE, MIN_TAX_RATE, MAX_TAX_RATE } from './constants'
@@ -92,6 +94,39 @@ describe('calculateCapitalTaxRate', () => {
   })
 })
 
+describe('calculateTax', () => {
+  it('should calculate correct tax for high income (43% bracket)', () => {
+    // Higher income bracket tax calculation
+    expect(calculateTax(60000)).toBe(18000)
+  })
+
+  it('should calculate correct tax for mid income (33% bracket)', () => {
+    // Mid income bracket tax calculation
+    expect(calculateTax(40000)).toBe(10400)
+  })
+
+  it('should calculate correct tax for low income (23% bracket)', () => {
+    // Low income bracket tax calculation
+    expect(calculateTax(20000)).toBe(4600)
+  })
+
+  it('should return 0 for 0 income', () => {
+    expect(calculateTax(0)).toBe(0)
+  })
+})
+
+describe('calculateTaxSavings', () => {
+  it('should calculate correct savings when deduction stays within highest bracket', () => {
+    // Tax savings within the same bracket
+    expect(calculateTaxSavings(60000, 5000)).toBe(2150)
+  })
+
+  it('should calculate correct savings when deduction crosses brackets', () => {
+    // Tax savings crossing brackets
+    expect(calculateTaxSavings(52000, 5000)).toBe(1850)
+  })
+})
+
 describe('calculateContributionSummary', () => {
   it('should calculate correctly with only TFR', () => {
     const annualSalary = 27000
@@ -107,15 +142,13 @@ describe('calculateContributionSummary', () => {
       yearOfFirstContribution,
     )
 
-    // TFR: 27000 / 13.5 = 2000
     expect(result.totalAnnualContribution).toBe(2000)
-    // Gross: 2000 * 10 = 20000
     expect(result.grossTotalContribution).toBe(20000)
     expect(result.taxRate).toBe(15)
-    // Tax: 20000 * 0.15 = 3000
     expect(result.totalTaxAmount).toBe(3000)
-    // Net: 20000 - 3000 = 17000
     expect(result.netTotalContribution).toBe(17000)
+    // Tax savings should be 0 when there are no deductible contributions
+    expect(result.annualTaxSavings).toBe(0)
   })
 
   it('should respect deductible limit and handle past membership', () => {
@@ -136,24 +169,18 @@ describe('calculateContributionSummary', () => {
       yearOfFirstContribution,
     )
 
-    // Annual TFR: 50000 / 13.5 = 3703.70...
-    // Annual Voluntary: 1000
-    // Annual Employer: 1000
-    // Remaining Deductible: 5300 - 1000 - 1000 = 3300
-    // Annual Additional: 3300
-    const expectedAnnual = 3703.7037 + 1000 + 1000 + 3300 // 9003.7037...
+    const expectedAnnual = 3703.7037 + 1000 + 1000 + 3300
     expect(result.totalAnnualContribution).toBeCloseTo(expectedAnnual, 4)
-
-    // Gross: expectedAnnual * 15 = 135055.55...
     expect(result.grossTotalContribution).toBeCloseTo(expectedAnnual * 15, 2)
-
     expect(result.taxRate).toBe(10.5)
 
-    // Tax amount: gross * 10.5%
     const expectedGross = expectedAnnual * 15
     const expectedTax = (expectedGross * 10.5) / 100
     expect(result.totalTaxAmount).toBeCloseTo(expectedTax, 2)
     expect(result.netTotalContribution).toBeCloseTo(expectedGross - expectedTax, 2)
+
+    // Tax savings calculation across IRPEF brackets
+    expect(result.annualTaxSavings).toBeCloseTo(1749, 1)
   })
 })
 
@@ -221,11 +248,8 @@ describe('calculateFinalSummary', () => {
 
     const result = calculateFinalSummary(yearlyData, 300)
 
-    // Total Capital Gains Tax: 0 + 20 = 20
     expect(result.totalCapitalGainsTaxPaid).toBe(20)
-    // Total Costs: 10 + 25 = 35
     expect(result.totalCostsPaid).toBe(35)
-    // Total Available: 2045 (end value) - 300 (contribution tax) = 1745
     expect(result.totalAvailableAmount).toBe(1745)
   })
 

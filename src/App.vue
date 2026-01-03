@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, nextTick } from 'vue'
 import PensionForm from './components/PensionForm.vue'
 import type { PensionFundData } from './types'
 import { simulate, type SimulationResult } from './simulation'
@@ -20,10 +20,14 @@ const formData = ref<PensionFundData>({
 })
 
 const simulationResult = ref<SimulationResult | null>(null)
+const resultsSection = ref<HTMLElement | null>(null)
 
-const submitForm = () => {
+const submitForm = async () => {
   simulationResult.value = simulate(formData.value)
-  console.log('Risultato simulazione:', simulationResult.value)
+  await nextTick()
+  if (resultsSection.value) {
+    resultsSection.value.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
 }
 </script>
 
@@ -47,7 +51,7 @@ const submitForm = () => {
           <PensionForm v-model="formData" @submit="submitForm" />
 
           <v-slide-y-transition>
-            <div v-if="simulationResult" class="mt-8">
+            <div v-if="simulationResult" ref="resultsSection" class="mt-8">
               <SimulationResults :result="simulationResult" />
               <SimulationChart :data="simulationResult.yearlyData" />
             </div>
