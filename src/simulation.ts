@@ -9,6 +9,14 @@ import {
   DEDUCTIBLE_LIMIT,
 } from './constants'
 
+export interface YearlySnapshot {
+  year: number
+  netGain: number
+  capitalGainsTaxPaid: number
+  costs: number
+  endValue: number
+}
+
 export interface ContributionSummary {
   taxRate: number
   totalAnnualContribution: number
@@ -20,6 +28,14 @@ export interface ContributionSummary {
 export interface SimulationResult {
   capitalGainsTaxRate: number
   contributionSummary: ContributionSummary
+  yearlyData: YearlySnapshot[]
+  summaryData: SummaryData
+}
+
+export interface SummaryData {
+  totalAvailableFund: number
+  totalCapitalGainsTaxPaid: number
+  totalCostsPaid: number
 }
 
 /**
@@ -93,6 +109,89 @@ export const calculateContributionSummary = (
   }
 }
 
+/**
+ * Calculates a year-by-year projection of the pension fund value.
+ */
+export const calculateYearlyProjections = (
+  yearsToRetirement: number,
+  expectedReturnPercent: number,
+  capitalGainsTaxRate: number,
+  annualContribution: number,
+  fundCostPercent: number,
+  fundCostFixed: number,
+): YearlySnapshot[] => {
+  const snapshots: YearlySnapshot[] = []
+
+  const currentYear = new Date().getFullYear()
+
+  let currentValue = 0
+
+  for (let i = 0; i < yearsToRetirement; i++) {
+    const startingValue = currentValue
+
+    // Compute capital gain
+    const capitalGain = startingValue * (expectedReturnPercent / 100)
+
+    // Compute net gain removing capital gain tax
+    const capitalGainsTaxPaid = capitalGain * (capitalGainsTaxRate / 100)
+    const netGain = capitalGain - capitalGainsTaxPaid
+
+    // Sum net gain to starting value + contributions
+    const valueBeforeCost = startingValue + netGain + annualContribution
+
+    // Compute percentage cost from obtained total
+    const percentageCost = valueBeforeCost * (fundCostPercent / 100)
+
+    // Detract costs
+    const totalCosts = percentageCost + fundCostFixed
+    const endValue = Math.max(0, valueBeforeCost - totalCosts)
+
+    snapshots.push({
+      year: currentYear + i,
+      netGain,
+      capitalGainsTaxPaid,
+      costs: totalCosts,
+      endValue,
+    })
+
+    currentValue = endValue
+  }
+
+  return snapshots
+}
+
+/**
+ * Calculates a summary of the final results of the simulation.
+ */
+export const calculateFinalSummary = (
+  yearlyData: YearlySnapshot[],
+  totalContributionTaxAmount: number,
+): SummaryData => {
+  if (yearlyData.length === 0) {
+    return {
+      totalAvailableFund: 0,
+      totalCapitalGainsTaxPaid: 0,
+      totalCostsPaid: 0,
+    }
+  }
+
+  const lastSnapshot = yearlyData[yearlyData.length - 1]
+  const totalCapitalGainsTaxPaid = yearlyData.reduce(
+    (acc, curr) => acc + curr.capitalGainsTaxPaid,
+    0,
+  )
+  const totalCostsPaid = yearlyData.reduce((acc, curr) => acc + curr.costs, 0)
+
+  // Final available fund = gross accumulated at end - taxes on contributions
+  const totalAvailableFund = Math.max(0, lastSnapshot!.endValue - totalContributionTaxAmount)
+
+  return {
+    totalAvailableFund,
+    totalCapitalGainsTaxPaid,
+    totalCostsPaid,
+  }
+}
+
 export const simulate = (data: PensionFundData): SimulationResult => {
   const {
     stockAllocationPercent,
@@ -102,6 +201,9 @@ export const simulate = (data: PensionFundData): SimulationResult => {
     voluntaryContributionPercent,
     employerContributionPercent,
     additionalDeductibleContributionPercent,
+    expectedReturnPercent,
+    fundCostPercent,
+    fundCostFixed,
   } = data
 
   const contributionSummary = calculateContributionSummary(
@@ -113,8 +215,23 @@ export const simulate = (data: PensionFundData): SimulationResult => {
     yearOfFirstContribution,
   )
 
+  const capitalGainsTaxRate = calculateWeightedTaxRate(stockAllocationPercent)
+
+  const yearlyData = calculateYearlyProjections(
+    yearsToRetirement,
+    expectedReturnPercent,
+    capitalGainsTaxRate,
+    contributionSummary.totalAnnualContribution,
+    fundCostPercent,
+    fundCostFixed,
+  )
+
+  const summaryData = calculateFinalSummary(yearlyData, contributionSummary.totalTaxAmount)
+
   return {
-    capitalGainsTaxRate: calculateWeightedTaxRate(stockAllocationPercent),
+    capitalGainsTaxRate,
     contributionSummary,
+    yearlyData,
+    summaryData,
   }
 }

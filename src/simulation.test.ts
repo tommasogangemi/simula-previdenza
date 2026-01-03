@@ -3,7 +3,10 @@ import {
   calculateWeightedTaxRate,
   calculateCapitalTaxRate,
   calculateContributionSummary,
+  calculateYearlyProjections,
+  calculateFinalSummary,
 } from './simulation'
+import type { YearlySnapshot } from './simulation'
 import { STOCK_GAINS_TAX_RATE, BOND_GAINS_TAX_RATE, MIN_TAX_RATE, MAX_TAX_RATE } from './constants'
 
 describe('calculateWeightedTaxRate', () => {
@@ -151,5 +154,85 @@ describe('calculateContributionSummary', () => {
     const expectedTax = (expectedGross * 10.5) / 100
     expect(result.totalTaxAmount).toBeCloseTo(expectedTax, 2)
     expect(result.netTotalContribution).toBeCloseTo(expectedGross - expectedTax, 2)
+  })
+})
+
+describe('calculateYearlyProjections', () => {
+  it('should calculate correctly with zero growth and zero costs', () => {
+    // 5 years, 0% return, 15% tax, 1000 contribution, 0% cost, 0 cost fixed
+    const result = calculateYearlyProjections(5, 0, 15, 1000, 0, 0)
+
+    expect(result).toHaveLength(5)
+    expect(result[0]?.endValue).toBe(1000)
+    expect(result[1]?.endValue).toBe(2000)
+    expect(result[4]?.endValue).toBe(5000)
+  })
+
+  it('should apply compounding growth and tax correctly', () => {
+    // 2 years, 10% return, 20% tax, 1000 contribution, 0% cost, 0 cost fixed
+    // Year 1: Start 0, Gain 0, Net Gain 0, Contrib 1000, End 1000
+    // Year 2: Start 1000, Gain 100, Net Gain 80 (20% tax), Contrib 1000, End 2080
+    const result = calculateYearlyProjections(2, 10, 20, 1000, 0, 0)
+
+    expect(result[0]?.endValue).toBe(1000)
+    expect(result[1]?.netGain).toBe(80)
+    expect(result[1]?.endValue).toBe(2080)
+  })
+
+  it('should subtract costs correctly', () => {
+    // 1 year, 0% return, 0% tax, 1000 contribution, 1% cost, 10 cost fixed
+    // Year 1: Start 0, Gain 0, Contrib 1000, Pre-cost 1000
+    // Cost: 1000 * 0.01 + 10 = 20
+    // End: 1000 - 20 = 980
+    const result = calculateYearlyProjections(1, 0, 0, 1000, 1, 10)
+
+    expect(result[0]?.costs).toBe(20)
+    expect(result[0]?.endValue).toBe(980)
+  })
+
+  it('should handle capital erosion when costs exceed gains and contributions', () => {
+    // Year 1: Start 0, Contrib 500, Cost: 500*0.1 + 100 = 150, End 350
+    // Year 2: Start 350, Contrib 500, Total 850, Cost: 850*0.1 + 100 = 185, End 665
+    const result = calculateYearlyProjections(2, 0, 0, 500, 10, 100)
+
+    expect(result[0]!.endValue).toBe(350)
+    expect(result[1]!.endValue).toBe(665)
+  })
+})
+
+describe('calculateFinalSummary', () => {
+  it('should aggregate yearly data correctly and subtract contribution tax', () => {
+    const yearlyData: YearlySnapshot[] = [
+      {
+        year: 2027,
+        netGain: 0,
+        capitalGainsTaxPaid: 0,
+        costs: 10,
+        endValue: 990,
+      },
+      {
+        year: 2028,
+        netGain: 80,
+        capitalGainsTaxPaid: 20,
+        costs: 25,
+        endValue: 2045,
+      },
+    ]
+
+    const result = calculateFinalSummary(yearlyData, 300)
+
+    // Total Capital Gains Tax: 0 + 20 = 20
+    expect(result.totalCapitalGainsTaxPaid).toBe(20)
+    // Total Costs: 10 + 25 = 35
+    expect(result.totalCostsPaid).toBe(35)
+    // Total Available: 2045 (end value) - 300 (contribution tax) = 1745
+    expect(result.totalAvailableFund).toBe(1745)
+  })
+
+  it('should handle empty yearly data', () => {
+    const result = calculateFinalSummary([], 0)
+    expect(result.totalAvailableFund).toBe(0)
+    expect(result.totalCapitalGainsTaxPaid).toBe(0)
+    expect(result.totalCostsPaid).toBe(0)
   })
 })
