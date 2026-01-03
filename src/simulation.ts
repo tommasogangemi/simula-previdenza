@@ -27,6 +27,10 @@ export interface ContributionSummary {
   netTotalContribution: number
   annualTaxSavings: number
   totalTaxSavings: number
+  annualEmployerContribution: number
+  totalEmployerContribution: number
+  annualVoluntaryContribution: number
+  annualAdditionalContribution: number
 }
 
 export interface SimulationResult {
@@ -145,6 +149,10 @@ export const calculateContributionSummary = (
     netTotalContribution,
     annualTaxSavings,
     totalTaxSavings: annualTaxSavings * yearsToRetirement,
+    annualEmployerContribution: annualEmployer,
+    totalEmployerContribution: annualEmployer * yearsToRetirement,
+    annualVoluntaryContribution: annualVoluntary,
+    annualAdditionalContribution: annualAdditional,
   }
 }
 
