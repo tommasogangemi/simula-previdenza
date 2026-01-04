@@ -338,6 +338,33 @@ const additionalContributionAmount = computed(() => {
         </div>
       </v-col>
 
+      <v-alert
+        color="info"
+        variant="tonal"
+        icon="mdi-information-outline"
+        class="text-left mt-2"
+        density="comfortable"
+      >
+        <div class="text-body-2">
+          <strong>Nota:</strong> Questa simulazione serve per fare confronti utili tra diversi
+          scenari e non per ottenere una previsione precisa al centesimo. Per questo usiamo alcune
+          semplificazioni:
+          <ul class="ml-4 mt-2">
+            <li>
+              <strong>Rendimenti costanti:</strong> Usiamo una media fissa per il rendimento annuo.
+            </li>
+            <li>
+              <strong>Stipendio stabile:</strong> Non sono considerati futuri aumenti di stipendio,
+              che aumenterebbero i versamenti di TFR e percentuali.
+            </li>
+            <li>
+              <strong>Calcolo conservativo:</strong> Gli interessi sono calcolati sul saldo
+              dell'anno precedente, non considerando i versamenti che avvengono nell'arco dell'anno.
+            </li>
+          </ul>
+        </div>
+      </v-alert>
+
       <v-col cols="12" class="mt-4">
         <v-btn
           type="submit"

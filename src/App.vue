@@ -56,35 +56,6 @@ const scrollToTop = () => {
                 fondo pensione. Puoi confrontare diverse strategie, vedere i vantaggi fiscali e
                 capire quanto incidono i costi, il tutto in modo semplice.
               </p>
-
-              <v-alert
-                color="info"
-                variant="tonal"
-                icon="mdi-information-outline"
-                class="text-left mt-4 mb-2"
-                density="comfortable"
-              >
-                <div class="text-body-2">
-                  <strong>Nota:</strong> Questa simulazione serve per fare confronti utili tra
-                  diversi scenari e non per ottenere una previsione precisa al centesimo. Per questo
-                  usiamo alcune semplificazioni:
-                  <ul class="ml-4 mt-2">
-                    <li>
-                      <strong>Rendimenti costanti:</strong> Usiamo una media fissa per il rendimento
-                      annuo.
-                    </li>
-                    <li>
-                      <strong>Stipendio stabile:</strong> Non sono considerati futuri aumenti di
-                      stipendio, che aumenterebbero i versamenti di TFR e percentuali.
-                    </li>
-                    <li>
-                      <strong>Calcolo conservativo:</strong> Gli interessi sono calcolati sul saldo
-                      dell'anno precedente, non considerando i versamenti che avvengono nell'arco
-                      dell'anno.
-                    </li>
-                  </ul>
-                </div>
-              </v-alert>
             </div>
           </div>
 
@@ -154,5 +125,21 @@ const scrollToTop = () => {
         </v-card>
       </v-container>
     </v-main>
+
+    <v-footer
+      class="bg-grey-lighten-4 justify-center align-center text-caption text-medium-emphasis"
+    >
+      <div class="px-4 py-2 text-center">
+        <a
+          href="https://github.com/tommasogangemi/simula-previdenza"
+          target="_blank"
+          class="text-decoration-none text-medium-emphasis d-inline-flex align-center"
+        >
+          Hai feedback o suggerimenti?
+          <v-icon icon="mdi-github" size="small" class="mx-1"></v-icon>
+          Contribuisci su GitHub
+        </a>
+      </div>
+    </v-footer>
   </v-app>
 </template>
