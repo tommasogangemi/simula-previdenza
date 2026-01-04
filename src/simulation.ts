@@ -1,115 +1,18 @@
-import type { PensionFundData } from './types'
-import {
-  STOCK_GAINS_TAX_RATE,
-  BOND_GAINS_TAX_RATE,
-  MIN_TAX_RATE,
-  MAX_TAX_RATE,
-  YEARS_BEFORE_TAX_RATE_DECREASE,
-  TAX_RATE_DECREASE,
-  DEDUCTIBLE_LIMIT,
-  INPS_CONTRIBUTION_RATE,
-  TAX_BRACKETS,
-} from './constants'
-
-export interface YearlySnapshot {
-  year: number
-  netGain: number
-  capitalGainsTaxPaid: number
-  costs: number
-  endValue: number
-}
-
-export interface ContributionSummary {
-  taxRate: number
-  totalAnnualContribution: number
-  grossTotalContribution: number
-  totalTaxAmount: number
-  netTotalContribution: number
-  annualTaxSavings: number
-  annualEmployerContribution: number
-  totalEmployerContribution: number
-  annualVoluntaryContribution: number
-  annualAdditionalContribution: number
-  annualCashFlow: number
-}
-
-export interface SimulationResult {
-  fundName?: string
-  capitalGainsTaxRate: number
-  contributionSummary: ContributionSummary
-  yearlyData: YearlySnapshot[]
-  summaryData: SummaryData
-}
-
-export interface SummaryData {
-  totalAvailableAmount: number
-  totalCapitalGainsTaxPaid: number
-  totalCostsPaid: number
-  totalCapitalGains: number
-}
+import type {
+  PensionFundData,
+  YearlySnapshot,
+  ContributionSummary,
+  SimulationResult,
+  SummaryData,
+} from './types'
+import { DEDUCTIBLE_LIMIT, INPS_CONTRIBUTION_RATE } from './constants'
+import { calculateWeightedTaxRate, calculateCapitalTaxRate, calculateTaxSavings } from './tax'
 
 /**
- * Calculates the weighted tax rate based on the given stock allocation percentage.
+ * Calculates the annual TFR based on annual salary.
  */
-export const calculateWeightedTaxRate = (stockAllocationPercent: number): number => {
-  const bondPercent = 100 - stockAllocationPercent
-  // Weighted average tax rate: (Stock% * STOCK_GAINS_TAX_RATE%) + (Bond% * BOND_GAINS_TAX_RATE%)
-  return (
-    (stockAllocationPercent / 100) * STOCK_GAINS_TAX_RATE +
-    (bondPercent / 100) * BOND_GAINS_TAX_RATE
-  )
-}
-
 export const calculateAnnualTFR = (annualSalary: number): number => {
   return annualSalary / 13.5
-}
-
-/**
- * Calculates the tax rate on contributions added to the pension fund based on the number of years of membership.
- */
-export const calculateCapitalTaxRate = (
-  yearOfFirstContribution: number,
-  yearsToRetirement: number,
-): number => {
-  const currentYear = new Date().getFullYear()
-  const projectedRetirementYear = currentYear + yearsToRetirement
-  const yearsOfMembership = projectedRetirementYear - yearOfFirstContribution
-
-  if (yearsOfMembership < YEARS_BEFORE_TAX_RATE_DECREASE) {
-    return MAX_TAX_RATE
-  }
-
-  const taxRate =
-    MAX_TAX_RATE - (yearsOfMembership - YEARS_BEFORE_TAX_RATE_DECREASE) * TAX_RATE_DECREASE
-
-  return Math.max(taxRate, MIN_TAX_RATE)
-}
-
-/**
- * Calculates the tax for a given income based on IRPEF brackets.
- */
-export const calculateTax = (income: number): number => {
-  let tax = 0
-  let remainingIncome = income
-
-  for (const bracket of TAX_BRACKETS) {
-    if (remainingIncome > bracket.threshold) {
-      const taxableInThisBracket = remainingIncome - bracket.threshold
-      tax += (taxableInThisBracket * bracket.rate) / 100
-      remainingIncome = bracket.threshold
-    }
-  }
-
-  return tax
-}
-
-/**
- * Calculates the tax savings (deduction) based on the income and the deductible amount.
- */
-export const calculateTaxSavings = (income: number, deduction: number): number => {
-  const taxBeforeDeduction = calculateTax(income)
-  const taxAfterDeduction = calculateTax(Math.max(0, income - deduction))
-  return taxBeforeDeduction - taxAfterDeduction
 }
 
 /**

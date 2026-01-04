@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { BOND_GAINS_TAX_RATE, STOCK_GAINS_TAX_RATE } from '@/constants'
-import type { SimulationResult } from '../simulation'
+import type { SimulationResult } from '../types'
 import { formatCurrency } from '../utils'
 import ResultRow from './ResultRow.vue'
 

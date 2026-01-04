@@ -13,7 +13,7 @@ import {
 } from 'chart.js'
 import { Line } from 'vue-chartjs'
 import { CHART_COLORS } from '../constants'
-import type { SimulationResult } from '../simulation'
+import type { SimulationResult } from '../types'
 import { formatCurrency } from '../utils'
 
 ChartJS.register(

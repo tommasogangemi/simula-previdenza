@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref, nextTick } from 'vue'
 import PensionForm from './components/PensionForm.vue'
-import type { PensionFundData } from './types'
-import { simulate, type SimulationResult } from './simulation'
+import type { PensionFundData, SimulationResult } from './types'
+import { simulate } from './simulation'
 import SimulationResults from './components/SimulationResults.vue'
 import SimulationChart from './components/SimulationChart.vue'
 import { CHART_COLORS } from './constants'
