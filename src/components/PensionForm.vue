@@ -324,9 +324,9 @@ const additionalContributionAmount = computed(() => {
                 </template>
 
                 <span>
-                  Versare di più conviene: puoi dedurre fino a {{ DEDUCTIBLE_LIMIT }}€ l'anno dal
-                  tuo reddito imponibile. Più alto è il tuo scaglione IRPEF, maggiore sarà il
-                  risparmio.
+                  Versare di più conviene: puoi dedurre fino a {{ DEDUCTIBLE_LIMIT }}€ (sommando
+                  contributo percentuale, datoriale e questo aggiuntivo) l'anno dal tuo reddito
+                  imponibile. Più alto è il tuo scaglione IRPEF, maggiore sarà il risparmio.
                 </span>
               </v-tooltip>
             </template>

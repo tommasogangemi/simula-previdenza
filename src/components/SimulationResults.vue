@@ -30,7 +30,7 @@ defineProps<{
           </span>
         </v-tooltip>
       </div>
-      <div class="text-h3 font-weight-bold text-primary">
+      <div class="text-h4 font-weight-bold text-primary">
         {{ formatCurrency(result.simulationSummary.finalNetAmount) }}
       </div>
     </v-card>
@@ -44,16 +44,16 @@ defineProps<{
       variant="tonal"
       class="pa-4 mb-4 border"
     >
-      <div class="d-flex align-center justify-space-between mb-2">
+      <div class="d-flex align-center justify-space-between ga-2 mb-2">
         <div class="text-subtitle-2 font-weight-medium d-flex align-center">
           <v-icon icon="mdi-account-minus-outline" size="18" class="mr-2"></v-icon>
           Versamento Percentuale dallo Stipendio
         </div>
-        <div class="text-h6 font-weight-bold text-warning-darken-3">
+        <div class="text-subtitle-1 font-weight-bold text-warning-darken-3">
           {{ formatCurrency(result.annualContributions.annualVoluntaryContribution) }}
         </div>
       </div>
-      <div class="d-flex align-center justify-space-between">
+      <div class="d-flex align-center justify-space-between ga-2">
         <div class="text-subtitle-2 font-weight-medium d-flex align-center">
           <v-icon icon="mdi-cash-plus" size="18" class="mr-2"></v-icon>
           Versamento Deducibile Aggiuntivo
@@ -72,7 +72,7 @@ defineProps<{
             </template>
           </v-tooltip>
         </div>
-        <div class="text-h6 font-weight-bold text-warning-darken-3">
+        <div class="text-subtitle-1 font-weight-bold text-warning-darken-3">
           {{ formatCurrency(result.annualContributions.annualAdditionalContribution) }}
         </div>
       </div>
@@ -87,21 +87,21 @@ defineProps<{
       variant="tonal"
       class="pa-4 mb-4 border"
     >
-      <div class="d-flex align-center justify-space-between mb-2">
+      <div class="d-flex align-center justify-space-between ga-2 mb-2">
         <div class="text-subtitle-2 font-weight-medium d-flex align-center">
           <v-icon icon="mdi-piggy-bank-outline" size="18" class="mr-2"></v-icon>
           Risparmio Fiscale Annuo
         </div>
-        <div class="text-h6 font-weight-bold text-success">
+        <div class="text-subtitle-1 font-weight-bold text-success">
           {{ formatCurrency(result.annualContributions.annualTaxSavings) }}
         </div>
       </div>
-      <div class="d-flex align-center justify-space-between">
+      <div class="d-flex align-center justify-space-between ga-2">
         <div class="text-subtitle-2 font-weight-medium d-flex align-center">
           <v-icon icon="mdi-hand-coin-outline" size="18" class="mr-2"></v-icon>
           Contributo Datoriale Annuo
         </div>
-        <div class="text-h6 font-weight-bold text-success">
+        <div class="text-subtitle-1 font-weight-bold text-success">
           {{ formatCurrency(result.annualContributions.annualEmployerContribution) }}
         </div>
       </div>
@@ -113,7 +113,7 @@ defineProps<{
       variant="tonal"
       class="pa-4 mb-4 border"
     >
-      <div class="d-flex align-center justify-space-between">
+      <div class="d-flex align-center justify-space-between ga-2">
         <div class="text-subtitle-2 font-weight-bold d-flex align-center">
           <v-icon
             :icon="
@@ -139,7 +139,7 @@ defineProps<{
           </v-tooltip>
         </div>
         <div
-          class="text-h6 font-weight-bold"
+          class="text-subtitle-1 font-weight-bold"
           :class="
             result.annualContributions.annualCashFlow >= 0
               ? 'text-success'
