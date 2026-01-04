@@ -42,10 +42,7 @@ const chartData = computed(() => {
 
   const datasets = props.simulations.map((sim, index) => {
     const color = CHART_COLORS[index % CHART_COLORS.length]
-    const label =
-      sim.contributionSummary.totalAnnualContribution > 0
-        ? sim.fundName || `Scenario ${index + 1}`
-        : `Scenario ${index + 1}`
+    const label = sim.fundName || `Scenario ${index + 1}`
 
     return {
       label: `${label} (€)`,

@@ -31,14 +31,14 @@ defineProps<{
         </v-tooltip>
       </div>
       <div class="text-h3 font-weight-bold text-primary">
-        {{ formatCurrency(result.summaryData.totalAvailableAmount) }}
+        {{ formatCurrency(result.simulationSummary.finalNetAmount) }}
       </div>
     </v-card>
 
     <v-card
       v-if="
-        result.contributionSummary.annualVoluntaryContribution ||
-        result.contributionSummary.annualAdditionalContribution
+        result.annualContributions.annualVoluntaryContribution ||
+        result.annualContributions.annualAdditionalContribution
       "
       color="warning"
       variant="tonal"
@@ -50,7 +50,7 @@ defineProps<{
           Versamento Percentuale dallo Stipendio
         </div>
         <div class="text-h6 font-weight-bold text-warning-darken-3">
-          {{ formatCurrency(result.contributionSummary.annualVoluntaryContribution) }}
+          {{ formatCurrency(result.annualContributions.annualVoluntaryContribution) }}
         </div>
       </div>
       <div class="d-flex align-center justify-space-between">
@@ -60,7 +60,7 @@ defineProps<{
 
           <v-tooltip
             location="top"
-            :text="`Qualora ti avvalessi delle deduzioni dovute dai versamenti aggiuntivi (parcentuale, datoriale oppure questo stesso) dal secondo anno potresti mantenere questo stesso versamento scontato del risparmio fiscale dell'anno precendente, quindi per un totale di ${formatCurrency(Math.max(0, result.contributionSummary.annualAdditionalContribution - result.contributionSummary.annualTaxSavings))} invece di ${formatCurrency(result.contributionSummary.annualAdditionalContribution)}`"
+            :text="`Qualora ti avvalessi delle deduzioni dovute dai versamenti aggiuntivi (parcentuale, datoriale oppure questo stesso) dal secondo anno potresti mantenere questo stesso versamento scontato del risparmio fiscale dell'anno precendente, quindi per un totale di ${formatCurrency(Math.max(0, result.annualContributions.annualAdditionalContribution - result.annualContributions.annualTaxSavings))} invece di ${formatCurrency(result.annualContributions.annualAdditionalContribution)}`"
           >
             <template v-slot:activator="{ props }">
               <v-icon
@@ -73,15 +73,15 @@ defineProps<{
           </v-tooltip>
         </div>
         <div class="text-h6 font-weight-bold text-warning-darken-3">
-          {{ formatCurrency(result.contributionSummary.annualAdditionalContribution) }}
+          {{ formatCurrency(result.annualContributions.annualAdditionalContribution) }}
         </div>
       </div>
     </v-card>
 
     <v-card
       v-if="
-        result.contributionSummary.annualTaxSavings ||
-        result.contributionSummary.annualEmployerContribution
+        result.annualContributions.annualTaxSavings ||
+        result.annualContributions.annualEmployerContribution
       "
       color="success"
       variant="tonal"
@@ -93,7 +93,7 @@ defineProps<{
           Risparmio Fiscale Annuo
         </div>
         <div class="text-h6 font-weight-bold text-success">
-          {{ formatCurrency(result.contributionSummary.annualTaxSavings) }}
+          {{ formatCurrency(result.annualContributions.annualTaxSavings) }}
         </div>
       </div>
       <div class="d-flex align-center justify-space-between">
@@ -102,14 +102,14 @@ defineProps<{
           Contributo Datoriale Annuo
         </div>
         <div class="text-h6 font-weight-bold text-success">
-          {{ formatCurrency(result.contributionSummary.annualEmployerContribution) }}
+          {{ formatCurrency(result.annualContributions.annualEmployerContribution) }}
         </div>
       </div>
     </v-card>
 
     <v-card
-      v-if="result.contributionSummary.annualCashFlow !== 0"
-      :color="result.contributionSummary.annualCashFlow >= 0 ? 'success' : 'warning'"
+      v-if="result.annualContributions.annualCashFlow !== 0"
+      :color="result.annualContributions.annualCashFlow >= 0 ? 'success' : 'warning'"
       variant="tonal"
       class="pa-4 mb-4 border"
     >
@@ -117,7 +117,7 @@ defineProps<{
         <div class="text-subtitle-2 font-weight-bold d-flex align-center">
           <v-icon
             :icon="
-              result.contributionSummary.annualCashFlow >= 0 ? 'mdi-cash-plus' : 'mdi-cash-minus'
+              result.annualContributions.annualCashFlow >= 0 ? 'mdi-cash-plus' : 'mdi-cash-minus'
             "
             size="20"
             class="mr-2"
@@ -141,12 +141,12 @@ defineProps<{
         <div
           class="text-h6 font-weight-bold"
           :class="
-            result.contributionSummary.annualCashFlow >= 0
+            result.annualContributions.annualCashFlow >= 0
               ? 'text-success'
               : 'text-warning-darken-3'
           "
         >
-          {{ formatCurrency(result.contributionSummary.annualCashFlow) }}
+          {{ formatCurrency(result.annualContributions.annualCashFlow) }}
         </div>
       </div>
     </v-card>
@@ -156,41 +156,41 @@ defineProps<{
         <v-expansion-panel-text>
           <ResultRow
             label="Totale Contributi Versati"
-            :value="formatCurrency(result.contributionSummary.grossTotalContribution)"
+            :value="formatCurrency(result.simulationSummary.grossTotalContribution)"
             icon="mdi-account-cash-outline"
           />
 
           <ResultRow
             label="Totale Contributo Datore"
-            :value="formatCurrency(result.contributionSummary.totalEmployerContribution)"
+            :value="formatCurrency(result.simulationSummary.totalEmployerContribution)"
             icon="mdi-hand-coin-outline"
             icon-color="success"
           />
 
           <ResultRow
             label="Totale Rendimenti Netti"
-            :value="formatCurrency(result.summaryData.totalCapitalGains)"
+            :value="formatCurrency(result.simulationSummary.totalCapitalGains)"
             icon="mdi-trending-up"
             icon-color="success"
           />
 
           <ResultRow
             label="Tasse Totali sui Rendimenti"
-            :value="formatCurrency(result.summaryData.totalCapitalGainsTaxPaid)"
+            :value="formatCurrency(result.simulationSummary.totalCapitalGainsTaxPaid)"
             icon="mdi-chart-line"
             icon-color="error"
           />
 
           <ResultRow
             label="Tasse Totali sul Versato"
-            :value="formatCurrency(result.contributionSummary.totalTaxAmount)"
+            :value="formatCurrency(result.simulationSummary.totalContributionsTaxAmount)"
             icon="mdi-bank-minus"
             icon-color="error"
           />
 
           <ResultRow
             label="Totale Costi Fondo"
-            :value="formatCurrency(result.summaryData.totalCostsPaid)"
+            :value="formatCurrency(result.simulationSummary.totalCostsPaid)"
             icon="mdi-cash-minus"
             icon-color="error"
           />
@@ -204,7 +204,7 @@ defineProps<{
 
           <ResultRow
             label="Aliquota Versato"
-            :value="`${result.contributionSummary.taxRate.toFixed(2)}%`"
+            :value="`${result.simulationSummary.contributionsTaxRate.toFixed(2)}%`"
             icon="mdi-bank-outline"
             tooltip="Tassazione agevolata sul capitale che scende dal 15% al 9% in base agli anni di adesione."
             class="mb-0"

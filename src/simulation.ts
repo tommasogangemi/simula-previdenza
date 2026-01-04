@@ -1,9 +1,9 @@
 import type {
   PensionFundData,
   YearlySnapshot,
-  ContributionSummary,
+  AnnualContributions,
   SimulationResult,
-  SummaryData,
+  SimulationSummary,
 } from './types'
 import { DEDUCTIBLE_LIMIT, INPS_CONTRIBUTION_RATE } from './constants'
 import { calculateWeightedTaxRate, calculateCapitalTaxRate, calculateTaxSavings } from './tax'
@@ -16,18 +16,15 @@ export const calculateAnnualTFR = (annualSalary: number): number => {
 }
 
 /**
- * Calculates the contribution summary based on the given parameters.
- * Focuses on the contributions that will be taxed at the end of the simulation with the contribution tax rate.
+ * Calculates the annual contribution summary based on the given parameters.
+ * Focuses on annual values only. Aggregated totals are calculated in the simulation summary.
  */
-export const calculateContributionSummary = (
+export const calculateAnnualContributions = (
   annualSalary: number,
   voluntaryContributionPercent: number,
   employerContributionPercent: number,
   additionalDeductibleContributionPercent: number,
-  yearsToRetirement: number,
-  yearOfFirstContribution: number,
-): ContributionSummary => {
-  const taxRate = calculateCapitalTaxRate(yearOfFirstContribution, yearsToRetirement)
+): AnnualContributions => {
   const annualTFR = calculateAnnualTFR(annualSalary)
 
   const annualVoluntary = (annualSalary * voluntaryContributionPercent) / 100
@@ -40,19 +37,11 @@ export const calculateContributionSummary = (
   const annualTaxSavings = calculateTaxSavings(taxableIncome, totalDeductibleContributions)
 
   const totalAnnualContribution = annualTFR + totalDeductibleContributions
-  const grossTotalContribution = totalAnnualContribution * yearsToRetirement
-  const totalTaxAmount = (grossTotalContribution * taxRate) / 100
-  const netTotalContribution = grossTotalContribution - totalTaxAmount
 
   return {
-    taxRate,
     totalAnnualContribution,
-    grossTotalContribution,
-    totalTaxAmount,
-    netTotalContribution,
     annualTaxSavings,
     annualEmployerContribution: annualEmployer,
-    totalEmployerContribution: annualEmployer * yearsToRetirement,
     annualVoluntaryContribution: annualVoluntary,
     annualAdditionalContribution: annualAdditional,
     annualCashFlow: annualTaxSavings - (annualVoluntary + annualAdditional),
@@ -113,16 +102,23 @@ export const calculateYearlyProjections = (
 /**
  * Calculates a summary of the final results of the simulation.
  */
-export const calculateFinalSummary = (
+export const calculateSimulationSummary = (
   yearlyData: YearlySnapshot[],
-  totalContributionTaxAmount: number,
-): SummaryData => {
+  annualContributionSummary: AnnualContributions,
+  yearsToRetirement: number,
+  yearOfFirstContribution: number,
+): SimulationSummary => {
   if (yearlyData.length === 0) {
     return {
-      totalAvailableAmount: 0,
+      finalNetAmount: 0,
       totalCapitalGainsTaxPaid: 0,
       totalCostsPaid: 0,
       totalCapitalGains: 0,
+      grossTotalContribution: 0,
+      totalContributionsTaxAmount: 0,
+      netTotalContribution: 0,
+      contributionsTaxRate: 0,
+      totalEmployerContribution: 0,
     }
   }
 
@@ -134,14 +130,28 @@ export const calculateFinalSummary = (
   const totalCostsPaid = yearlyData.reduce((acc, curr) => acc + curr.costs, 0)
   const totalCapitalGains = yearlyData.reduce((acc, curr) => acc + curr.netGain, 0)
 
+  // Contribution aggregations
+  const contributionTaxRate = calculateCapitalTaxRate(yearOfFirstContribution, yearsToRetirement)
+  const grossTotalContribution =
+    annualContributionSummary.totalAnnualContribution * yearsToRetirement
+  const totalTaxAmount = (grossTotalContribution * contributionTaxRate) / 100
+  const netTotalContribution = grossTotalContribution - totalTaxAmount
+  const totalEmployerContribution =
+    annualContributionSummary.annualEmployerContribution * yearsToRetirement
+
   // Final available fund = gross accumulated at end - taxes on contributions
-  const totalAvailableAmount = Math.max(0, lastSnapshot!.endValue - totalContributionTaxAmount)
+  const totalAvailableAmount = Math.max(0, lastSnapshot!.endValue - totalTaxAmount)
 
   return {
-    totalAvailableAmount,
+    finalNetAmount: totalAvailableAmount,
     totalCapitalGainsTaxPaid,
     totalCostsPaid,
     totalCapitalGains,
+    grossTotalContribution,
+    totalContributionsTaxAmount: totalTaxAmount,
+    netTotalContribution,
+    contributionsTaxRate: contributionTaxRate,
+    totalEmployerContribution,
   }
 }
 
@@ -159,13 +169,11 @@ export const simulate = (data: PensionFundData): SimulationResult => {
     fundCostFixed,
   } = data
 
-  const contributionSummary = calculateContributionSummary(
+  const annualContributionSummary = calculateAnnualContributions(
     annualSalary,
     voluntaryContributionPercent,
     employerContributionPercent,
     additionalDeductibleContributionPercent,
-    yearsToRetirement,
-    yearOfFirstContribution,
   )
 
   const capitalGainsTaxRate = calculateWeightedTaxRate(stockAllocationPercent)
@@ -174,18 +182,23 @@ export const simulate = (data: PensionFundData): SimulationResult => {
     yearsToRetirement,
     expectedReturnPercent,
     capitalGainsTaxRate,
-    contributionSummary.totalAnnualContribution,
+    annualContributionSummary.totalAnnualContribution,
     fundCostPercent,
     fundCostFixed,
   )
 
-  const summaryData = calculateFinalSummary(yearlyData, contributionSummary.totalTaxAmount)
+  const simulationSummary = calculateSimulationSummary(
+    yearlyData,
+    annualContributionSummary,
+    yearsToRetirement,
+    yearOfFirstContribution,
+  )
 
   return {
     fundName: data.fundName,
     capitalGainsTaxRate,
-    contributionSummary,
+    annualContributions: annualContributionSummary,
     yearlyData,
-    summaryData,
+    simulationSummary,
   }
 }

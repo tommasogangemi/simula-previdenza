@@ -1,65 +1,56 @@
 import { describe, it, expect } from 'vitest'
 import {
-  calculateContributionSummary,
+  calculateAnnualContributions,
   calculateYearlyProjections,
-  calculateFinalSummary,
+  calculateSimulationSummary,
 } from './simulation'
-import type { YearlySnapshot } from './types'
+import type { YearlySnapshot, AnnualContributions } from './types'
 
-describe('calculateContributionSummary', () => {
+describe('calculateAnnualContributionSummary', () => {
   it('should calculate correctly with only TFR', () => {
     const annualSalary = 27000
-    const yearsToRetirement = 10
-    const yearOfFirstContribution = new Date().getFullYear()
 
-    const result = calculateContributionSummary(
+    const result = calculateAnnualContributions(
       annualSalary,
       0, // voluntary
       0, // employer
       0, // additional
-      yearsToRetirement,
-      yearOfFirstContribution,
     )
 
     expect(result.totalAnnualContribution).toBe(2000)
-    expect(result.grossTotalContribution).toBe(20000)
-    expect(result.taxRate).toBe(15)
-    expect(result.totalTaxAmount).toBe(3000)
-    expect(result.netTotalContribution).toBe(17000)
     // Tax savings should be 0 when there are no deductible contributions
     expect(result.annualTaxSavings).toBe(0)
+    expect(result.annualVoluntaryContribution).toBe(0)
+    expect(result.annualEmployerContribution).toBe(0)
+    expect(result.annualAdditionalContribution).toBe(0)
+    expect(result.annualCashFlow).toBe(0)
   })
 
-  it('should respect deductible limit and handle past membership', () => {
+  it('should respect deductible limit and calculated correct annual values', () => {
     const annualSalary = 50000
     const voluntaryPercent = 2 // 1000
     const employerPercent = 2 // 1000
     const additionalPercent = 100 // Takes all remaining deductible
-    const yearsToRetirement = 15
-    const currentYear = new Date().getFullYear()
-    const yearOfFirstContribution = currentYear - 15 // 15 years in the past
 
-    const result = calculateContributionSummary(
+    const result = calculateAnnualContributions(
       annualSalary,
       voluntaryPercent,
       employerPercent,
       additionalPercent,
-      yearsToRetirement,
-      yearOfFirstContribution,
     )
 
     const expectedAnnual = 3703.7037 + 1000 + 1000 + 3300
     expect(result.totalAnnualContribution).toBeCloseTo(expectedAnnual, 4)
-    expect(result.grossTotalContribution).toBeCloseTo(expectedAnnual * 15, 2)
-    expect(result.taxRate).toBe(10.5)
-
-    const expectedGross = expectedAnnual * 15
-    const expectedTax = (expectedGross * 10.5) / 100
-    expect(result.totalTaxAmount).toBeCloseTo(expectedTax, 2)
-    expect(result.netTotalContribution).toBeCloseTo(expectedGross - expectedTax, 2)
+    expect(result.annualEmployerContribution).toBe(1000)
+    expect(result.annualVoluntaryContribution).toBe(1000)
+    expect(result.annualAdditionalContribution).toBe(3300)
 
     // Tax savings calculation across IRPEF brackets
     expect(result.annualTaxSavings).toBeCloseTo(1749, 1)
+
+    // Cash flow = Tax Savings - (Voluntary + Additional)
+    // 1749 - (1000 + 3300) = 1749 - 4300 = -2551
+    expect(result.annualCashFlow).toBeCloseTo(1749 - 4300, 1)
   })
 })
 
@@ -106,7 +97,7 @@ describe('calculateYearlyProjections', () => {
   })
 })
 
-describe('calculateFinalSummary', () => {
+describe('calculateSimulationSummary', () => {
   it('should aggregate yearly data correctly and subtract contribution tax', () => {
     const yearlyData: YearlySnapshot[] = [
       {
@@ -125,16 +116,49 @@ describe('calculateFinalSummary', () => {
       },
     ]
 
-    const result = calculateFinalSummary(yearlyData, 300)
+    const annualSummary: AnnualContributions = {
+      totalAnnualContribution: 1000,
+      annualTaxSavings: 0,
+      annualEmployerContribution: 0,
+      annualVoluntaryContribution: 0,
+      annualAdditionalContribution: 0,
+      annualCashFlow: 0,
+    }
+
+    // 2 years to retirement, start now
+    const result = calculateSimulationSummary(
+      yearlyData,
+      annualSummary,
+      2,
+      new Date().getFullYear(),
+    )
 
     expect(result.totalCapitalGainsTaxPaid).toBe(20)
     expect(result.totalCostsPaid).toBe(35)
-    expect(result.totalAvailableAmount).toBe(1745)
+
+    // Gross total contribution = 1000 * 2 = 2000
+    expect(result.grossTotalContribution).toBe(2000)
+
+    // Tax amount calculated based on years of membership
+    expect(result.contributionsTaxRate).toBe(15)
+    expect(result.totalContributionsTaxAmount).toBe(300)
+
+    // Available amount = EndValue (2045) - Tax (300) = 1745
+    expect(result.finalNetAmount).toBe(1745)
   })
 
   it('should handle empty yearly data', () => {
-    const result = calculateFinalSummary([], 0)
-    expect(result.totalAvailableAmount).toBe(0)
+    const annualSummary: AnnualContributions = {
+      totalAnnualContribution: 1000,
+      annualTaxSavings: 0,
+      annualEmployerContribution: 0,
+      annualVoluntaryContribution: 0,
+      annualAdditionalContribution: 0,
+      annualCashFlow: 0,
+    }
+
+    const result = calculateSimulationSummary([], annualSummary, 10, 2020)
+    expect(result.finalNetAmount).toBe(0)
     expect(result.totalCapitalGainsTaxPaid).toBe(0)
     expect(result.totalCostsPaid).toBe(0)
   })

@@ -20,22 +20,28 @@ export interface YearlySnapshot {
   endValue: number
 }
 
-export interface ContributionSummary {
-  taxRate: number
+/**
+ * Aggregates the values related to contributions to the fund, on a yearly basis.
+ */
+export interface AnnualContributions {
   totalAnnualContribution: number
-  grossTotalContribution: number
-  totalTaxAmount: number
-  netTotalContribution: number
   annualTaxSavings: number
   annualEmployerContribution: number
-  totalEmployerContribution: number
   annualVoluntaryContribution: number
   annualAdditionalContribution: number
   annualCashFlow: number
 }
 
-export interface SummaryData {
-  totalAvailableAmount: number
+/**
+ * Aggregates the final values for the simulation with totals over the whole simulation period.
+ */
+export interface SimulationSummary {
+  finalNetAmount: number
+  grossTotalContribution: number
+  totalContributionsTaxAmount: number
+  netTotalContribution: number
+  contributionsTaxRate: number
+  totalEmployerContribution: number
   totalCapitalGainsTaxPaid: number
   totalCostsPaid: number
   totalCapitalGains: number
@@ -44,7 +50,7 @@ export interface SummaryData {
 export interface SimulationResult {
   fundName?: string
   capitalGainsTaxRate: number
-  contributionSummary: ContributionSummary
+  annualContributions: AnnualContributions
   yearlyData: YearlySnapshot[]
-  summaryData: SummaryData
+  simulationSummary: SimulationSummary
 }
