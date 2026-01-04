@@ -50,12 +50,42 @@ const scrollToTop = () => {
             <h1 class="text-h4 font-weight-bold text-primary mb-2">
               Simulatore Previdenza Complementare
             </h1>
-            <p class="text-subtitle-1 text-medium-emphasis">
-              Scopri quanto potresti accumulare per il tuo futuro. Inserisci i tuoi dati per
-              iniziare la simulazione.
-              <br />
-              La simulazione parte dal presupposto che il TFR sia sempre versato nel fondo pensione.
-            </p>
+            <div class="text-subtitle-1 text-medium-emphasis mx-auto" style="max-width: 800px">
+              <p class="mb-4">
+                Questo strumento ti aiuta a capire come potrebbero crescere i tuoi risparmi in un
+                fondo pensione. Puoi confrontare diverse strategie, vedere i vantaggi fiscali e
+                capire quanto incidono i costi, il tutto in modo semplice.
+              </p>
+
+              <v-alert
+                color="info"
+                variant="tonal"
+                icon="mdi-information-outline"
+                class="text-left mt-4 mb-2"
+                density="comfortable"
+              >
+                <div class="text-body-2">
+                  <strong>Nota:</strong> Questa simulazione serve per fare confronti utili tra
+                  diversi scenari, non è una "sfera di cristallo". Per questo usiamo alcune
+                  semplificazioni:
+                  <ul class="ml-4 mt-2">
+                    <li>
+                      <strong>Rendimenti costanti:</strong> Usiamo una media fissa per il rendimento
+                      annuo.
+                    </li>
+                    <li>
+                      <strong>Stipendio stabile:</strong> Non sono considerati futuri aumenti di
+                      stipendio, che aumenterebbero i versamenti di TFR e percentuali.
+                    </li>
+                    <li>
+                      <strong>Calcolo conservativa:</strong> Gli interessi sono calcolati sul saldo
+                      dell'anno precedente, non considerando i versamenti che avvengono nell'arco
+                      dell'anno.
+                    </li>
+                  </ul>
+                </div>
+              </v-alert>
+            </div>
           </div>
 
           <PensionForm v-model="formData" @submit="submitForm" />
