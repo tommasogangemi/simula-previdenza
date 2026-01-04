@@ -110,9 +110,8 @@ const additionalContributionAmount = computed(() => {
             </template>
 
             <span>
-              Indica l'allocazione desiderata. Per orizzonti temporali oltre i 10 anni una
-              allocazione più aggressiva (100% azionaria) è quella che potrebbe portare ai
-              rendimenti maggiori.
+              Scegli quanto investire in azioni. Di norma, per periodi lunghi (>10 anni), una quota
+              azionaria più alta può offrire rendimenti migliori.
             </span>
           </v-tooltip>
         </div>
@@ -147,7 +146,7 @@ const additionalContributionAmount = computed(() => {
           max="100"
           step="0.1"
           suffix="%"
-          hint="Stima prudenziale del rendimento lordo."
+          hint="Stima prudente del rendimento lordo annuo."
           persistent-hint
           variant="outlined"
           color="primary"
@@ -220,10 +219,10 @@ const additionalContributionAmount = computed(() => {
               </template>
 
               <span>
-                Indica l'anno di apertura del primo fondo pensione, indipendentemente da quale. Dopo
-                {{ YEARS_BEFORE_TAX_RATE_DECREASE }} anni dalla prima adesione, la tassazione sul
-                capitale versato diminuisce dello {{ TAX_RATE_DECREASE }}% all'anno, partendo dal
-                {{ MAX_TAX_RATE }}% fino a raggiungere un minimo del {{ MIN_TAX_RATE }}%.
+                L'anno di apertura del tuo primo fondo. È importante perché l'anzianità premia: dopo
+                {{ YEARS_BEFORE_TAX_RATE_DECREASE }} anni, la ritenuta fiscale scende dello
+                {{ TAX_RATE_DECREASE }}% ogni anno, passando dal {{ MAX_TAX_RATE }}% fino a un
+                minimo del {{ MIN_TAX_RATE }}%.
               </span>
             </v-tooltip>
           </template>
@@ -256,10 +255,8 @@ const additionalContributionAmount = computed(() => {
               </template>
 
               <span>
-                Percentuale dello stipendio lordo che si sceglie di versare volontariamente nel
-                fondo pensione. Nei fondi pensione negoziali, ovvero quelli legati alle categorie
-                dei vari CCNL versare una data percentuale volontaria permette di avvalersi del
-                contributo datoriale concordato dal contratto nazionale.
+                La percentuale del tuo stipendio che decidi di versare. Spesso serve per sbloccare
+                anche il contributo del datore di lavoro.
               </span>
             </v-tooltip>
           </template>
@@ -292,10 +289,8 @@ const additionalContributionAmount = computed(() => {
               </template>
 
               <span>
-                Contributo datoriale. Una percentuale dello stipendio che viene corrisposta da parte
-                dell'azienda, qualora il lavoratore effettui un contributo volontario. Le
-                percentuali sono previste dal contratto nazionale e variano in base alla categoria
-                del CCNL, e sono reperibili sui siti dei rispettivi fondi di categoria.
+                Soldi extra! La quota che la tua azienda versa se tu contribuisci col minimo
+                richiesto (verifica il tuo contratto).
               </span>
             </v-tooltip>
           </template>
@@ -329,11 +324,9 @@ const additionalContributionAmount = computed(() => {
                 </template>
 
                 <span>
-                  Ogni anno versamenti al fondo pensione fino ad un ammontare di
-                  {{ DEDUCTIBLE_LIMIT }}€ sono deducibili ed abbassano il montante IRPEF. A questo
-                  ammontare concorrono versamenti volontari in percentuale, versamenti datoriali e
-                  versamenti aggiuntivi. Più alto è il proprio scaglione IRPEF più efficiente è
-                  versare fino a saturare il plafond di deducibilità residuo.
+                  Versare di più conviene: puoi dedurre fino a {{ DEDUCTIBLE_LIMIT }}€ l'anno dal
+                  tuo reddito imponibile. Più alto è il tuo scaglione IRPEF, maggiore sarà il
+                  risparmio.
                 </span>
               </v-tooltip>
             </template>

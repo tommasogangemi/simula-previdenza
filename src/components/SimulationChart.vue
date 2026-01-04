@@ -100,7 +100,7 @@ const chartOptions = {
 
       <v-tooltip
         location="top"
-        text="Il grafico mostra il montante finale per ogni anno, senza aver applicato le tasse sui contributi. Serve principalmente a scopo comparativo, il valore finale deve essere ancora tassato per ottenere il totale mostrato nei risultati di sopra."
+        text="Qui vedi come cresce il capitale lordo anno per anno. Ricorda che la tassazione finale si applica solo quando ritirerai i soldi."
       >
         <template v-slot:activator="{ props }">
           <v-icon

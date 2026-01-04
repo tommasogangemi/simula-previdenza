@@ -66,8 +66,8 @@ const scrollToTop = () => {
               >
                 <div class="text-body-2">
                   <strong>Nota:</strong> Questa simulazione serve per fare confronti utili tra
-                  diversi scenari, non è una "sfera di cristallo". Per questo usiamo alcune
-                  semplificazioni:
+                  diversi scenari e non per ottenere una previsione precisa al centesimo. Per questo
+                  usiamo alcune semplificazioni:
                   <ul class="ml-4 mt-2">
                     <li>
                       <strong>Rendimenti costanti:</strong> Usiamo una media fissa per il rendimento
@@ -78,7 +78,7 @@ const scrollToTop = () => {
                       stipendio, che aumenterebbero i versamenti di TFR e percentuali.
                     </li>
                     <li>
-                      <strong>Calcolo conservativa:</strong> Gli interessi sono calcolati sul saldo
+                      <strong>Calcolo conservativo:</strong> Gli interessi sono calcolati sul saldo
                       dell'anno precedente, non considerando i versamenti che avvengono nell'arco
                       dell'anno.
                     </li>
@@ -130,11 +130,10 @@ const scrollToTop = () => {
                 icon="mdi-compare"
                 border="start"
               >
-                <div class="text-subtitle-1 font-weight-bold">Confronta diversi scenari</div>
+                <div class="text-subtitle-1 font-weight-bold">Fai un confronto</div>
                 <div class="text-body-2 mb-3">
-                  Puoi cambiare i dati nel modulo sopra e cliccare su
-                  <strong>"Aggiungi simulazione"</strong> per vedere come diverse scelte impattano
-                  sul tuo capitale finale.
+                  Cambia qualche numero sopra e clicca <strong>"Aggiungi simulazione"</strong> per
+                  vedere le differenze fianco a fianco.
                 </div>
                 <div class="d-flex justify-end">
                   <v-btn
