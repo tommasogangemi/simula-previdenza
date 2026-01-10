@@ -1,4 +1,4 @@
-export interface PensionFundData {
+export type PensionFundData = {
   fundName?: string
   annualSalary: number
   fundCostPercent: number
@@ -6,13 +6,13 @@ export interface PensionFundData {
   stockAllocationPercent: number
   expectedReturnPercent: number
   yearsToRetirement: number
-  yearOfFirstContribution: number
-  voluntaryContributionPercent: number
-  employerContributionPercent: number
-  additionalDeductibleContributionPercent: number
+  yearOfFirstContribution?: number
+  voluntaryContributionPercent?: number
+  employerContributionPercent?: number
+  additionalDeductibleContributionPercent?: number
 }
 
-export interface YearlySnapshot {
+export type YearlySnapshot = {
   year: number
   netGain: number
   capitalGainsTaxPaid: number
@@ -23,7 +23,7 @@ export interface YearlySnapshot {
 /**
  * Aggregates the values related to contributions to the fund, on a yearly basis.
  */
-export interface AnnualContributions {
+export type AnnualContributions = {
   totalAnnualContribution: number
   annualTaxSavings: number
   annualEmployerContribution: number
@@ -35,7 +35,7 @@ export interface AnnualContributions {
 /**
  * Aggregates the final values for the simulation with totals over the whole simulation period.
  */
-export interface SimulationSummary {
+export type SimulationSummary = {
   finalNetAmount: number
   grossTotalContribution: number
   totalContributionsTaxAmount: number
@@ -47,7 +47,7 @@ export interface SimulationSummary {
   totalCapitalGains: number
 }
 
-export interface SimulationResult {
+export type SimulationResult = {
   fundName?: string
   capitalGainsTaxRate: number
   annualContributions: AnnualContributions

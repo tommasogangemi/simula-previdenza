@@ -7,24 +7,11 @@ import SimulationResults from './components/SimulationResults.vue'
 import SimulationChart from './components/SimulationChart.vue'
 import { CHART_COLORS } from './constants'
 
-const formData = ref<PensionFundData>({
-  annualSalary: 30000,
-  fundCostPercent: 1.0,
-  fundCostFixed: 0,
-  stockAllocationPercent: 50,
-  expectedReturnPercent: 4.0,
-  yearsToRetirement: 30,
-  yearOfFirstContribution: 2026,
-  voluntaryContributionPercent: 0,
-  employerContributionPercent: 0,
-  additionalDeductibleContributionPercent: 0,
-})
-
 const simulations = ref<SimulationResult[]>([])
 const resultsSection = ref<HTMLElement | null>(null)
 
-const submitForm = async () => {
-  const result = simulate(formData.value)
+const submitForm = async (formData: PensionFundData) => {
+  const result = simulate(formData)
   simulations.value.push(result)
   await nextTick()
   if (resultsSection.value) {
@@ -59,7 +46,7 @@ const scrollToTop = () => {
             </div>
           </div>
 
-          <PensionForm v-model="formData" @submit="submitForm" />
+          <PensionForm @submit="submitForm" />
 
           <v-slide-y-transition>
             <div v-if="simulations.length > 0" ref="resultsSection" class="mt-8">

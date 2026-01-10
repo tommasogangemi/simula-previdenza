@@ -9,19 +9,42 @@ import {
   YEARS_BEFORE_TAX_RATE_DECREASE,
 } from '../constants'
 import { formatCurrency } from '../utils'
-
-const formData = defineModel<PensionFundData>({ required: true })
+import { useForm } from '@vue-reactive-form/core'
+import { pensionFormValidationSchema } from '@/validation'
 
 const emit = defineEmits<{
-  (e: 'submit'): void
+  submit: [PensionFundData]
 }>()
 
+const DEFAULT_STATE = {
+  stockAllocationPercent: 100,
+  expectedReturnPercent: 7.0,
+}
+
+const { form, handleSubmit } = useForm<PensionFundData>(DEFAULT_STATE, {
+  validationSchema: pensionFormValidationSchema,
+})
+
+const onSubmit = handleSubmit({
+  onSuccess: (formState) => {
+    emit('submit', formState)
+  },
+})
+
 const voluntaryAmount = computed(() => {
-  return (formData.value.annualSalary * formData.value.voluntaryContributionPercent) / 100
+  return (
+    ((form.annualSalary.$control.state.value ?? 0) *
+      (form.voluntaryContributionPercent.$control.state.value ?? 0)) /
+    100
+  )
 })
 
 const employerAmount = computed(() => {
-  return (formData.value.annualSalary * formData.value.employerContributionPercent) / 100
+  return (
+    ((form.annualSalary.$control.state.value ?? 0) *
+      (form.employerContributionPercent.$control.state.value ?? 0)) /
+    100
+  )
 })
 
 const remainingDeductible = computed(() => {
@@ -29,16 +52,21 @@ const remainingDeductible = computed(() => {
 })
 
 const additionalContributionAmount = computed(() => {
-  return (remainingDeductible.value * formData.value.additionalDeductibleContributionPercent) / 100
+  return (
+    (remainingDeductible.value *
+      (form.additionalDeductibleContributionPercent.$control.state.value ?? 0)) /
+    100
+  )
 })
 </script>
 
 <template>
-  <v-form @submit.prevent="emit('submit')">
+  <v-form @submit.prevent="onSubmit">
     <v-row>
       <v-col cols="12">
         <v-text-field
-          v-model="formData.fundName"
+          v-model="form.fundName.$control.state.value"
+          :error-messages="form.fundName.$control.errorMessage.value"
           label="Nome del Fondo"
           type="text"
           hint="Il nome del fondo pensione che stai considerando."
@@ -51,7 +79,8 @@ const additionalContributionAmount = computed(() => {
 
       <v-col cols="12">
         <v-text-field
-          v-model.number="formData.annualSalary"
+          v-model.number="form.annualSalary.$control.state.value"
+          :error-messages="form.annualSalary.$control.errorMessage.value"
           label="Retribuzione Annua Lorda (RAL)"
           type="number"
           min="0"
@@ -66,7 +95,8 @@ const additionalContributionAmount = computed(() => {
 
       <v-col cols="12" md="6">
         <v-text-field
-          v-model.number="formData.fundCostPercent"
+          v-model.number="form.fundCostPercent.$control.state.value"
+          :error-messages="form.fundCostPercent.$control.errorMessage.value"
           label="Costo annuo del fondo (%)"
           type="number"
           min="0"
@@ -82,7 +112,8 @@ const additionalContributionAmount = computed(() => {
 
       <v-col cols="12" md="6">
         <v-text-field
-          v-model.number="formData.fundCostFixed"
+          v-model.number="form.fundCostFixed.$control.state.value"
+          :error-messages="form.fundCostFixed.$control.errorMessage.value"
           label="Costo annuo fisso (€)"
           type="number"
           min="0"
@@ -116,7 +147,7 @@ const additionalContributionAmount = computed(() => {
           </v-tooltip>
         </div>
         <v-slider
-          v-model.number="formData.stockAllocationPercent"
+          v-model.number="form.stockAllocationPercent.$control.state.value"
           min="0"
           max="100"
           step="5"
@@ -125,21 +156,22 @@ const additionalContributionAmount = computed(() => {
           thumb-label
           hide-details
           class="mb-1"
-        ></v-slider>
+        />
         <div class="d-flex justify-center align-center ga-2">
           <span class="text-body-2 font-weight-medium text-medium-emphasis">
-            {{ 100 - formData.stockAllocationPercent }}% Obbligazioni
+            {{ 100 - (form.stockAllocationPercent.$control.state.value ?? 0) }}% Obbligazioni
           </span>
           <span class="text-body-2 font-weight-medium text-medium-emphasis"> - </span>
           <span class="text-body-2 font-weight-bold text-primary">
-            {{ formData.stockAllocationPercent }}% Azioni
+            {{ form.stockAllocationPercent.$control.state.value }}% Azioni
           </span>
         </div>
       </v-col>
 
       <v-col cols="12">
         <v-text-field
-          v-model.number="formData.expectedReturnPercent"
+          v-model.number="form.expectedReturnPercent.$control.state.value"
+          :error-messages="form.expectedReturnPercent.$control.errorMessage.value"
           label="Rendimento annuo atteso (%)"
           type="number"
           min="-100"
@@ -180,7 +212,8 @@ const additionalContributionAmount = computed(() => {
 
       <v-col cols="12" md="6">
         <v-text-field
-          v-model.number="formData.yearsToRetirement"
+          v-model.number="form.yearsToRetirement.$control.state.value"
+          :error-messages="form.yearsToRetirement.$control.errorMessage.value"
           label="Anni al pensionamento"
           type="number"
           min="1"
@@ -196,7 +229,8 @@ const additionalContributionAmount = computed(() => {
 
       <v-col cols="12" md="6">
         <v-text-field
-          v-model.number="formData.yearOfFirstContribution"
+          v-model.number="form.yearOfFirstContribution.$control.state.value"
+          :error-messages="form.yearOfFirstContribution.$control.errorMessage.value"
           label="Inizio previdenza complementare"
           type="number"
           min="2026"
@@ -231,7 +265,8 @@ const additionalContributionAmount = computed(() => {
 
       <v-col cols="12" md="6">
         <v-text-field
-          v-model.number="formData.voluntaryContributionPercent"
+          v-model.number="form.voluntaryContributionPercent.$control.state.value"
+          :error-messages="form.voluntaryContributionPercent.$control.errorMessage.value"
           label="Contributo Volontario (%)"
           type="number"
           min="0"
@@ -265,7 +300,8 @@ const additionalContributionAmount = computed(() => {
 
       <v-col cols="12" md="6">
         <v-text-field
-          v-model.number="formData.employerContributionPercent"
+          v-model.number="form.employerContributionPercent.$control.state.value"
+          :error-messages="form.employerContributionPercent.$control.errorMessage.value"
           label="Contributo Datoriale (%)"
           type="number"
           min="0"
@@ -300,7 +336,10 @@ const additionalContributionAmount = computed(() => {
       <v-col cols="12">
         <div class="d-flex gap-4">
           <v-text-field
-            v-model.number="formData.additionalDeductibleContributionPercent"
+            v-model.number="form.additionalDeductibleContributionPercent.$control.state.value"
+            :error-messages="
+              form.additionalDeductibleContributionPercent.$control.errorMessage.value
+            "
             label="Versamento deducibile aggiuntivo (%)"
             type="number"
             min="0"

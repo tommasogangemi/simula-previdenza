@@ -159,14 +159,14 @@ export const simulate = (data: PensionFundData): SimulationResult => {
   const {
     stockAllocationPercent,
     annualSalary,
-    yearOfFirstContribution,
     yearsToRetirement,
-    voluntaryContributionPercent,
-    employerContributionPercent,
-    additionalDeductibleContributionPercent,
     expectedReturnPercent,
     fundCostPercent,
     fundCostFixed,
+    yearOfFirstContribution = new Date().getFullYear(),
+    voluntaryContributionPercent = 0,
+    employerContributionPercent = 0,
+    additionalDeductibleContributionPercent = 0,
   } = data
 
   const annualContributionSummary = calculateAnnualContributions(
